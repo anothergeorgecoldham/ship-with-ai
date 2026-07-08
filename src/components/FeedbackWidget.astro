@@ -1,0 +1,94 @@
+---
+// Feedback / questions widget — the one interactive, code-bearing feature
+// on the site. Client-side only (works on static GitHub Pages, no backend).
+//
+// Carries two intentionally seeded issues for the live demo — do not fix:
+//   - §5.1: renders submissions with an outdated `marked` (0.3.19), which
+//     does not sanitise its output. Flagged by Dependabot.
+//   - §5.5: the submit handler (src/lib/feedback.js) has no input validation.
+//     Flagged by Copilot Code Review.
+---
+<section class="card" id="feedback-widget">
+  <h2>Questions &amp; feedback</h2>
+  <p>Leave a question or comment about this session — it renders below, right in your browser.</p>
+  <form id="feedback-form">
+    <div class="field">
+      <label for="feedback-name">Name</label>
+      <input id="feedback-name" name="name" type="text" placeholder="Ada" />
+    </div>
+    <div class="field">
+      <label for="feedback-message">Message (Markdown supported)</label>
+      <textarea id="feedback-message" name="message" rows="3" placeholder="What did you think?"></textarea>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+  <div id="feedback-list" aria-live="polite"></div>
+</section>
+
+<style>
+  #feedback-widget .field { margin-bottom: 0.8rem; }
+  #feedback-widget label { display: block; font-size: 0.85rem; margin-bottom: 0.25rem; }
+  #feedback-widget input,
+  #feedback-widget textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    font: inherit;
+  }
+  #feedback-widget button {
+    background: #0969da;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1.1rem;
+    cursor: pointer;
+  }
+  #feedback-list { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem; }
+  .feedback-item {
+    border-top: 1px solid #d0d7de;
+    padding-top: 0.6rem;
+  }
+  .feedback-item .meta { font-size: 0.8rem; color: #57606a; }
+</style>
+
+<script>
+  // Outdated markdown renderer (see package.json) — genuinely used here to
+  // turn each submission's message into HTML. Old versions do not sanitise.
+  import { marked } from 'marked';
+  import { loadSubmissions, saveSubmission } from '../lib/feedback.js';
+  import { FEEDBACK_ANALYTICS_TOKEN } from '../lib/analytics-config.js';
+
+  // Demo-only: would normally authenticate a feedback-analytics beacon.
+  // FEEDBACK_ANALYTICS_TOKEN is a fake placeholder — see analytics-config.js.
+  console.debug('feedback widget ready', FEEDBACK_ANALYTICS_TOKEN.slice(0, 4));
+
+  const form = document.getElementById('feedback-form');
+  const list = document.getElementById('feedback-list');
+
+  function render() {
+    const submissions = loadSubmissions();
+    list.innerHTML = submissions
+      .slice()
+      .reverse()
+      .map((s) => {
+        const html = marked(s.message || '');
+        const who = s.name || 'Anonymous';
+        const when = new Date(s.submittedAt).toLocaleString();
+        return `<div class="feedback-item"><div class="meta">${who} · ${when}</div>${html}</div>`;
+      })
+      .join('');
+  }
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+    const name = data.get('name');
+    const message = data.get('message');
+    saveSubmission(name, message);
+    form.reset();
+    render();
+  });
+
+  render();
+</script>

@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="AI-assisted Security Review">
+  <h1>AI-assisted security review</h1>
+  <p>
+    Separate from code review on a pull request, this is the automated layer that watches the
+    <em>supply chain</em> continuously:
+  </p>
+  <ul>
+    <li><strong>Dependabot alerts</strong> — flags the outdated Markdown renderer this site's feedback widget depends on, and opens the upgrade PR</li>
+    <li><strong>Dependency review</strong> — blocks a pull request from introducing a new vulnerable dependency</li>
+    <li><strong>Secret scanning with push protection</strong> — catches a credential before it's committed, and flags one that already was</li>
+  </ul>
+  <p>
+    Where Copilot Code Review looks at a diff, this layer looks at the whole dependency graph and
+    commit history — the exact surface OWASP's A03: Software Supply Chain Failures is about.
+  </p>
+</Layout>

@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Secure Your Supply Chain">
+  <h1>Secure your supply chain</h1>
+  <p>
+    Developers ranked <strong>Software Supply Chain Failures</strong> the #1 risk in OWASP's
+    2025 community survey — roughly half of respondents put it first. It's the modern successor
+    to "using components with known vulnerabilities," widened to cover anything that can go wrong
+    while you <em>build, distribute, or update</em> software: a vulnerable dependency, an
+    unpinned CI/CD action, a leaked token.
+  </p>
+  <p>
+    The 2025 <strong>Shai-Hulud</strong> npm worm is the real-world version of this: a
+    self-propagating package that harvested developer secrets and npm tokens as it spread.
+    SolarWinds and Log4Shell are the two other names people already know.
+  </p>
+  <h2>What actually protects you</h2>
+  <ul>
+    <li><strong>Track your dependencies</strong> — know every package you ship, including transitive ones (an SBOM helps).</li>
+    <li><strong>Keep them current</strong> — Dependabot opens a PR the moment an advisory lands.</li>
+    <li><strong>Pin your Actions</strong> — reference third-party GitHub Actions by full commit SHA, not a floating tag or branch.</li>
+    <li><strong>Least-privilege your tokens</strong> — grant a workflow only the permissions the job needs.</li>
+    <li><strong>Never commit secrets</strong> — and turn on push protection so a slip never reaches the remote.</li>
+  </ul>
+  <p>
+    None of this requires exotic tooling — it's Dependabot, dependency review, secret scanning,
+    and a little care in how you write workflow YAML. See <a href="/ship-with-ai/diy/">Do it yourself</a>
+    to turn it all on.
+  </p>
+</Layout>

@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="GitHub Actions (CI/CD)">
+  <h1>GitHub Actions (CI/CD)</h1>
+  <p>
+    <code>.github/workflows/deploy.yml</code> is what turns a merged pull request into a live
+    site. On every push to <code>main</code> it:
+  </p>
+  <ol>
+    <li>Installs dependencies with <code>npm ci</code></li>
+    <li>Builds the Astro site</li>
+    <li>Runs a security job — <code>npm audit</code> and dependency review — as a merge gate</li>
+    <li>Deploys the built site to GitHub Pages</li>
+  </ol>
+  <p>
+    The workflow that ships in this repo is deliberately unhardened in one place: a third-party
+    Action pinned only by tag, and a broader-than-needed <code>permissions</code> block. That's
+    the CI/CD half of the supply-chain story — the pipeline that builds and deploys your code
+    needs the same scrutiny as the code itself.
+  </p>
+</Layout>

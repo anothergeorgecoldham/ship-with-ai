@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Agent Merge">
+  <h1>Agent Merge</h1>
+  <p>
+    Once Copilot Code Review leaves its comments, Agent Merge is what actually closes the loop.
+    It reads the review findings, pushes the fixes — pin the Action, scope the token, validate
+    the input — and merges the pull request the moment checks go green.
+  </p>
+  <p>
+    The same pattern handles routine hygiene: when Dependabot opens a version-bump PR for an
+    outdated package, Agent Merge merges it automatically once the build and security checks
+    pass. No one has to remember to click merge on a dependency bump ever again.
+  </p>
+  <div class="card">
+    This is the headline capability in the live demo: an AI-written PR goes in with real issues,
+    and comes out the other side fixed and merged, without a human doing the mechanical work.
+  </div>
+</Layout>

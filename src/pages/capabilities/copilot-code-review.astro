@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Copilot Code Review">
+  <h1>GitHub Copilot Code Review</h1>
+  <p>
+    Every pull request in this repo — including the AI-drafted one that kicks off the live demo —
+    gets an automatic first pass from Copilot Code Review before a human ever looks at it.
+  </p>
+  <p>It reads the diff and leaves inline comments for things a linter usually misses:</p>
+  <ul>
+    <li>A third-party GitHub Action pinned to a tag instead of a commit SHA</li>
+    <li>A workflow requesting broader permissions than the job needs</li>
+    <li>A missing <code>integrity</code>/<code>crossorigin</code> attribute on a third-party script</li>
+    <li>A form handler with no input validation</li>
+  </ul>
+  <p>
+    None of these are "vulnerabilities" a dependency scanner would catch — they're judgment
+    calls about code quality and defensive coding. That's the point: Copilot Code Review is the
+    reviewer that reads intent, not just signatures.
+  </p>
+</Layout>

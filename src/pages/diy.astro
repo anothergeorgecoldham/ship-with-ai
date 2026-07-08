@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Do It Yourself">
+  <h1>Do it yourself</h1>
+  <p>
+    Everything in this pipeline is free on a public repository, and enterprises can enforce the
+    same protections org-wide by policy. Clone this repo and turn it on:
+  </p>
+  <pre>git clone https://github.com/anothergeorgecoldham/ship-with-ai.git
+cd ship-with-ai
+npm install
+npm run dev</pre>
+  <h2>In your repo settings</h2>
+  <ul>
+    <li><strong>Settings → Code security</strong> — enable Dependabot alerts, Dependabot security updates, dependency review, code scanning, and secret scanning with push protection.</li>
+    <li><strong>Settings → Copilot</strong> — enable Copilot Code Review and Agent Merge (auto-merge on green checks).</li>
+    <li><strong>Settings → Pages</strong> — set Source to "GitHub Actions" so <code>.github/workflows/deploy.yml</code> can publish the site.</li>
+    <li><strong><code>.github/dependabot.yml</code></strong> — already configured in this repo for npm version updates.</li>
+  </ul>
+  <h2>Resources</h2>
+  <ul>
+    <li><a href="https://owasp.org/Top10/2025/A03_2025-Software_Supply_Chain_Failures/">OWASP Top 10:2025 — A03 Software Supply Chain Failures</a></li>
+    <li><a href="https://docs.github.com/en/code-security/dependabot">GitHub Docs — Dependabot</a></li>
+    <li><a href="https://docs.github.com/en/code-security/secret-scanning">GitHub Docs — Secret scanning</a></li>
+    <li><a href="https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions">GitHub Docs — Security hardening for GitHub Actions</a></li>
+  </ul>
+</Layout>

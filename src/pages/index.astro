@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FeedbackWidget from '../components/FeedbackWidget.astro';
+---
+<Layout title="Ship with AI">
+  <h1>Ship with AI: Review, Secure, and Deploy with Confidence</h1>
+  <p>
+    AI writes more code, faster than ever. That's the easy part. The hard part — the part that
+    decides whether shipping with AI is safe — is what happens next: who reviews it, who secures
+    it, and how it gets from a pull request to production without anyone's attention slipping.
+  </p>
+  <p>
+    This site is both things at once. It's the companion material for AI Genius Season 5,
+    Episode 3, and it's also the exact repository that was reviewed, secured, and deployed live
+    on stream, using the pipeline described on the next few pages.
+  </p>
+  <div class="card">
+    <strong>The trust gap.</strong> The more code an AI assistant produces, the more your review,
+    security, and release process has to carry. Speed without those guardrails just moves risk
+    downstream — into your dependencies, your CI/CD pipeline, and your production environment.
+  </div>
+  <h2>Where to start</h2>
+  <ul>
+    <li><a href="pipeline/">The pipeline</a> — how an idea becomes a deployed change</li>
+    <li><a href="secure-supply-chain/">Secure your supply chain</a> — the security spine of this demo</li>
+    <li><a href="diy/">Do it yourself</a> — turn all of this on in your own repo</li>
+  </ul>
+  <FeedbackWidget />
+</Layout>
