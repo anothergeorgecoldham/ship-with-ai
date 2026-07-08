@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
 ---
 <Layout title="The Pipeline">
   <h1>The pipeline</h1>
@@ -11,14 +12,14 @@ import Layout from '../layouts/Layout.astro';
 GitHub Actions (build + supply-chain security + deploy) → GitHub Pages (live site)</pre>
   <p>The loop repeats automatically on every future change. Five capabilities carry it:</p>
   <ol>
-    <li><a href="/ship-with-ai/capabilities/copilot-code-review/">Copilot Code Review</a> — an AI reviewer on every pull request</li>
-    <li><a href="/ship-with-ai/capabilities/agent-merge/">Agent Merge</a> — remediates findings and merges when checks are green</li>
-    <li><a href="/ship-with-ai/capabilities/github-actions/">GitHub Actions (CI/CD)</a> — builds, gates, and deploys</li>
-    <li><a href="/ship-with-ai/capabilities/security-review/">AI-assisted security review</a> — the supply-chain layer: dependencies, secrets, tokens</li>
-    <li><a href="/ship-with-ai/capabilities/lifecycle-automation/">End-to-end lifecycle automation</a> — the whole loop, running on every change</li>
+    <li><a href={`${base}capabilities/copilot-code-review/`}>Copilot Code Review</a> — an AI reviewer on every pull request</li>
+    <li><a href={`${base}capabilities/agent-merge/`}>Agent Merge</a> — remediates findings and merges when checks are green</li>
+    <li><a href={`${base}capabilities/github-actions/`}>GitHub Actions (CI/CD)</a> — builds, gates, and deploys</li>
+    <li><a href={`${base}capabilities/security-review/`}>AI-assisted security review</a> — the supply-chain layer: dependencies, secrets, tokens</li>
+    <li><a href={`${base}capabilities/lifecycle-automation/`}>End-to-end lifecycle automation</a> — the whole loop, running on every change</li>
   </ol>
   <p>
-    See <a href="/ship-with-ai/secure-supply-chain/">Secure your supply chain</a> for why the
+    See <a href={`${base}secure-supply-chain/`}>Secure your supply chain</a> for why the
     security beats in this demo live in dependencies and CI/CD, not just application code.
   </p>
 </Layout>
