@@ -26,7 +26,7 @@ jobs:
       - run: npm audit --audit-level=high
       # NOTE (seeded issue, brief §5.2): pinned only by floating major tag,
       # not a full commit SHA. Copilot Code Review should flag this.
-      - uses: withastro/action@v3
+      - uses: withastro/action@v6
         with:
           path: .
           node-version: 20
