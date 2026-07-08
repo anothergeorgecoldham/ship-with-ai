@@ -17,6 +17,46 @@ committed (fake) secret. See [`RUNSHEET.md`](./RUNSHEET.md) for the full walkthr
 [`src/pages/secure-supply-chain.astro`](./src/pages/secure-supply-chain.astro) for the plain-English
 explanation.
 
+## Prerequisites (set these up before you record)
+
+Learned the hard way while standing this repo up — none of this is obvious from the repo alone,
+and if any one piece is missing the relevant beat just silently won't fire.
+
+### Account / license
+
+- **An active Copilot license that includes code review + the coding agent** — Copilot Pro, Pro+,
+  Max, Business, or Enterprise. Copilot Free does not expose these features at all.
+- On your profile → **Settings → Copilot → Features**, confirm these two are **Enabled**:
+  - **Copilot code review** — "Use Copilot to review your code and generate pull request summaries."
+  - **Copilot cloud agent** — "Delegate tasks to Copilot cloud agent in repositories where it is
+    enabled." (This is what backs the coding agent and Agent Merge.)
+  - If your seat comes from an org/enterprise, these may show a shield icon meaning the org
+    enforces them — that's fine, it just means you can't turn them off, not that they're broken.
+
+### Repo settings (owner/admin access required)
+
+- **Settings → Rules → Rulesets → New ruleset** — add the **"Automatically request Copilot code
+  review"** rule targeting your default branch. Without this, Copilot never reviews a PR
+  automatically; you'd have to request it by hand every time.
+- **Settings → General → Pull Requests → Allow auto-merge** — must be checked, or Agent Merge has
+  nothing to merge into even when checks are green. (Also settable via API:
+  `gh api -X PATCH /repos/<owner>/<repo> -f allow_auto_merge=true`.)
+- **Settings → Pages → Source: GitHub Actions** — required before `deploy.yml` can publish
+  anything; if you skip this, every push to `main` fails at the `deploy` job with a 404-style
+  error, even though `build` succeeds. Can also be set via API:
+  `gh api -X POST /repos/<owner>/<repo>/pages -f build_type=workflow`.
+- **Settings → Code security** — turn on Dependabot alerts, Dependabot security updates,
+  dependency review, code scanning, and secret scanning with push protection. These are what
+  actually surface the seeded issues in `RUNSHEET.md` §5.1 and §5.3.
+
+### Local `gh`/git auth gotcha
+
+If `git push` is rejected with *"refusing to allow an OAuth App to create or update workflow
+`.github/workflows/...` without `workflow` scope"*, your active `gh`/git credential doesn't have
+the `workflow` OAuth scope. Either `gh auth refresh -h github.com -s workflow`, or push using a
+credential/token that already has it (e.g. `gh auth token` from an account with `workflow` in its
+scopes, passed via `git -c http.extraHeader=...`).
+
 ## Run it locally
 
 ```bash
@@ -27,7 +67,8 @@ npm run dev
 ```
 
 Then open the printed local URL. `npm run build` produces the static site in `dist/`;
-`npm run preview` serves that build locally.
+`npm run preview` serves that build locally — the safest way to look at the site without
+touching the live repo, its workflow runs, or any seeded issue.
 
 ## Structure
 
