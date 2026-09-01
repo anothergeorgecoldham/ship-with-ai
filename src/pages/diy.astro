@@ -1,23 +1,44 @@
 ---
 import Layout from '../layouts/Layout.astro';
 ---
-<Layout title="Do It Yourself">
-  <h1>Do it yourself</h1>
+<Layout title="Follow Along">
+  <h1>Follow the demonstration</h1>
   <p>
-    Everything in this pipeline is free on a public repository, and enterprises can enforce the
-    same protections org-wide by policy. Clone this repo and turn it on:
+    Watch for six visible states. Each one answers a different question about whether an
+    AI-generated change is ready to ship.
+  </p>
+
+  <ol>
+    <li><strong>Issue —</strong> Is the intended outcome clear and testable?</li>
+    <li><strong>Draft —</strong> Can we inspect exactly what the coding agent changed?</li>
+    <li><strong>Review —</strong> Did an independent reviewer find code or workflow risks?</li>
+    <li><strong>Fix —</strong> Were those findings converted into verified changes?</li>
+    <li><strong>Gate —</strong> Will policy stop a build that still carries supply-chain risk?</li>
+    <li><strong>Deploy —</strong> Did only the remediated version reach the live site?</li>
+  </ol>
+
+  <div class="card">
+    <strong>The important boundary.</strong> The coding agent, reviewer, security scanners, and
+    deployment policy are separate controls. No single AI decision is trusted to ship by itself.
+  </div>
+
+  <h2>Why the pipeline stops</h2>
+  <p>
+    The training start state deliberately uses a vulnerable Markdown dependency. The application
+    builds, but the production audit rejects it. Dependabot proposes an upgrade; after that change
+    passes the dependency policy, deployment can continue.
+  </p>
+
+  <h2>Explore safely</h2>
+  <p>
+    This repository contains deliberate training findings. Run it locally to inspect the site,
+    but do not deploy the start state as a production application.
   </p>
   <pre>git clone https://github.com/anothergeorgecoldham/ship-with-ai.git
 cd ship-with-ai
-npm install
+npm ci
 npm run dev</pre>
-  <h2>In your repo settings</h2>
-  <ul>
-    <li><strong>Settings → Code security</strong> — enable Dependabot alerts, Dependabot security updates, dependency review, code scanning, and secret scanning with push protection.</li>
-    <li><strong>Settings → Copilot</strong> — enable Copilot Code Review and Agent Merge (auto-merge on green checks).</li>
-    <li><strong>Settings → Pages</strong> — set Source to "GitHub Actions" so <code>.github/workflows/deploy.yml</code> can publish the site.</li>
-    <li><strong><code>.github/dependabot.yml</code></strong> — already configured in this repo for npm version updates.</li>
-  </ul>
+
   <h2>Resources</h2>
   <ul>
     <li><a href="https://owasp.org/Top10/2025/A03_2025-Software_Supply_Chain_Failures/">OWASP Top 10:2025 — A03 Software Supply Chain Failures</a></li>

@@ -1,8 +1,11 @@
 import { defineConfig } from 'astro/config';
 
-// GitHub Pages project-page deploy: `base` must match the repo name so
-// links and assets resolve under /ship-with-ai. See RUNSHEET.md / README.md.
+const [owner, repository] =
+  process.env.GITHUB_REPOSITORY?.split('/') ?? ['anothergeorgecoldham', 'ship-with-ai'];
+
+// Derive the project-page URL in Actions so repositories created from the
+// template work without source edits. Local development uses the canonical URL.
 export default defineConfig({
-  site: 'https://anothergeorgecoldham.github.io',
-  base: '/ship-with-ai',
+  site: `https://${owner}.github.io`,
+  base: `/${repository}`,
 });

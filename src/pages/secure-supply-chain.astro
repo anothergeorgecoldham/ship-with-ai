@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
 ---
 <Layout title="Secure Your Supply Chain">
   <h1>Secure your supply chain</h1>
@@ -25,7 +26,7 @@ import Layout from '../layouts/Layout.astro';
   </ul>
   <p>
     None of this requires exotic tooling — it's Dependabot, dependency review, secret scanning,
-    and a little care in how you write workflow YAML. See <a href="/ship-with-ai/diy/">Do it yourself</a>
-    to turn it all on.
+    and a little care in how you write workflow YAML. See
+    <a href={`${base}diy/`}>Follow the demonstration</a> for the complete lifecycle.
   </p>
 </Layout>

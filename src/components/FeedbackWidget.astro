@@ -3,8 +3,8 @@
 // on the site. Client-side only (works on static GitHub Pages, no backend).
 //
 // Carries two intentionally seeded issues for the live demo — do not fix:
-//   - §5.1: renders submissions with an outdated `marked` (0.3.19), which
-//     does not sanitise its output. Flagged by Dependabot.
+//   - §5.1: renders submissions with `marked` 0.3.19, which has known
+//     regular-expression denial-of-service vulnerabilities. Flagged by Dependabot.
 //   - §5.5: the submit handler (src/lib/feedback.js) has no input validation.
 //     Flagged by Copilot Code Review.
 ---
@@ -27,37 +27,48 @@
 
 <style>
   #feedback-widget .field { margin-bottom: 0.8rem; }
-  #feedback-widget label { display: block; font-size: 0.85rem; margin-bottom: 0.25rem; }
+  #feedback-widget label { display: block; font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--muted); }
   #feedback-widget input,
   #feedback-widget textarea {
     width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #d0d7de;
-    border-radius: 6px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(11, 27, 35, 0.6);
+    color: var(--fg);
     font: inherit;
   }
+  #feedback-widget input:focus,
+  #feedback-widget textarea:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
   #feedback-widget button {
-    background: #0969da;
-    color: #fff;
+    background: var(--gradient);
+    color: #0b1b23;
+    font-weight: 600;
     border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    padding: 0.55rem 1.3rem;
     cursor: pointer;
   }
+  #feedback-widget button:hover { opacity: 0.9; }
   #feedback-list { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem; }
   .feedback-item {
-    border-top: 1px solid #d0d7de;
+    border-top: 1px solid var(--border);
     padding-top: 0.6rem;
   }
-  .feedback-item .meta { font-size: 0.8rem; color: #57606a; }
+  .feedback-item .meta { font-size: 0.8rem; color: var(--muted); }
 </style>
 
 <script>
-  // Outdated markdown renderer (see package.json) — genuinely used here to
-  // turn each submission's message into HTML. Old versions do not sanitise.
-  import { marked } from 'marked';
+  // The intentionally outdated renderer is genuinely used here. Rendering
+  // untrusted Markdown without sanitising its HTML is a separate optional beat.
+  import * as markedModule from 'marked';
   import { loadSubmissions, saveSubmission } from '../lib/feedback.js';
   import { FEEDBACK_ANALYTICS_TOKEN } from '../lib/analytics-config.js';
+
+  const renderMarkdown = markedModule.marked ?? markedModule.default;
 
   // Demo-only: would normally authenticate a feedback-analytics beacon.
   // FEEDBACK_ANALYTICS_TOKEN is a fake placeholder — see analytics-config.js.
@@ -72,7 +83,7 @@
       .slice()
       .reverse()
       .map((s) => {
-        const html = marked(s.message || '');
+        const html = renderMarkdown(s.message || '');
         const who = s.name || 'Anonymous';
         const when = new Date(s.submittedAt).toLocaleString();
         return `<div class="feedback-item"><div class="meta">${who} · ${when}</div>${html}</div>`;

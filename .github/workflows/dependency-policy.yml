@@ -1,0 +1,28 @@
+name: Dependency policy
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Capture dependency audit
+        run: npm audit --json > audit.json || true
+      - name: Enforce expected dependency state
+        env:
+          EXPECTED_STATE: ${{ startsWith(github.head_ref, 'dependabot/') && 'clean' || 'start' }}
+        run: node scripts/check-audit-state.mjs "$EXPECTED_STATE"

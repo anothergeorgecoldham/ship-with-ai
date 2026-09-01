@@ -18,8 +18,13 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     <title>{title} · Ship with AI</title>
   </head>
   <body>
+    <div class="ribbon ribbon-teal" aria-hidden="true"></div>
+    <div class="ribbon ribbon-purple" aria-hidden="true"></div>
     <header class="site-header">
-      <a class="brand" href={base}>Ship with AI</a>
+      <a class="brand" href={base}>
+        <span class="brand-mark">AI</span><span class="brand-mark brand-mark-gradient">Genius</span>
+        <span class="brand-sub">Ship with AI</span>
+      </a>
       <nav>
         <a href={`${base}pipeline/`}>Pipeline</a>
         <a href={`${base}capabilities/copilot-code-review/`}>Code Review</a>
@@ -28,7 +33,7 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
         <a href={`${base}capabilities/security-review/`}>Security</a>
         <a href={`${base}capabilities/lifecycle-automation/`}>Lifecycle</a>
         <a href={`${base}secure-supply-chain/`}>Supply Chain</a>
-        <a href={`${base}diy/`}>Do It Yourself</a>
+        <a href={`${base}diy/`}>Follow Along</a>
       </nav>
     </header>
     <main>
@@ -39,36 +44,116 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     </footer>
     <style>
       :root {
-        color-scheme: light dark;
+        color-scheme: dark;
         --max-width: 780px;
-        --fg: #1b1f23;
-        --muted: #57606a;
-        --accent: #0969da;
-        --border: #d0d7de;
+        --bg: #0b1b23;
+        --bg-alt: #10242e;
+        --fg: #eef4f7;
+        --muted: #93a8b3;
+        --border: rgba(148, 178, 195, 0.22);
+        --teal: #4fd1c9;
+        --purple: #a48cf2;
+        --amber: #e8b04b;
+        --gradient: linear-gradient(120deg, var(--purple), #6fb8e6 55%, var(--teal));
+        --font-heading: 'Segoe UI', system-ui, sans-serif;
+        --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
       }
       * { box-sizing: border-box; }
+      html { background: var(--bg); }
       body {
         margin: 0;
-        font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        min-height: 100vh;
+        font-family: var(--font-body);
         color: var(--fg);
-        line-height: 1.6;
+        background: var(--bg);
+        line-height: 1.7;
+        position: relative;
+        overflow-x: hidden;
       }
+
+      /* Decorative gradient ribbons, echoing the AI Genius deck backdrop */
+      .ribbon {
+        position: fixed;
+        top: -10vh;
+        right: -12vw;
+        width: 46vw;
+        height: 150vh;
+        border-radius: 999px;
+        filter: blur(2px);
+        opacity: 0.55;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .ribbon-teal {
+        background: linear-gradient(200deg, #4fb7e6, #3fd4c6 60%, transparent 100%);
+        width: 20vw;
+        transform: rotate(8deg);
+      }
+      .ribbon-purple {
+        background: linear-gradient(200deg, #a48cf2, #6fb8e6 55%, #d9c8e6 100%);
+        width: 16vw;
+        right: -4vw;
+        top: 30vh;
+        transform: rotate(-6deg);
+      }
+
+      .site-header,
+      main,
+      .site-footer {
+        position: relative;
+        z-index: 1;
+      }
+
       .site-header {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        justify-content: space-between;
         gap: 1rem;
-        padding: 1rem 1.5rem;
+        padding: 1.1rem 1.75rem;
         border-bottom: 1px solid var(--border);
+        background: rgba(11, 27, 35, 0.7);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 5;
       }
-      .brand { font-weight: 700; text-decoration: none; color: var(--fg); font-size: 1.1rem; }
-      nav { display: flex; flex-wrap: wrap; gap: 0.9rem; }
-      nav a { color: var(--muted); text-decoration: none; font-size: 0.92rem; }
-      nav a:hover { color: var(--accent); }
+      .brand {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        text-decoration: none;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 1.15rem;
+        color: var(--fg);
+      }
+      .brand-mark-gradient {
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .brand-sub {
+        font-family: var(--font-body);
+        font-weight: 400;
+        font-size: 0.8rem;
+        color: var(--muted);
+        border-left: 1px solid var(--border);
+        padding-left: 0.6rem;
+      }
+      nav { display: flex; flex-wrap: wrap; gap: 1.1rem; }
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.88rem;
+        transition: color 0.15s ease;
+      }
+      nav a:hover { color: var(--teal); }
       main {
         max-width: var(--max-width);
         margin: 0 auto;
-        padding: 2rem 1.5rem 4rem;
+        padding: 3rem 1.5rem 4rem;
       }
       .site-footer {
         text-align: center;
@@ -77,16 +162,70 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
         padding: 2rem 1rem;
         border-top: 1px solid var(--border);
       }
-      h1 { font-size: 1.9rem; }
-      h2 { font-size: 1.3rem; margin-top: 2rem; }
-      code { background: rgba(110,118,129,0.15); padding: 0.1rem 0.35rem; border-radius: 4px; }
-      pre { background: #24292e; color: #e1e4e8; padding: 1rem; border-radius: 8px; overflow-x: auto; }
-      .card {
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 1.2rem 1.4rem;
-        margin: 1rem 0;
+      h1, h2, h3 {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        letter-spacing: -0.01em;
       }
+      h1 {
+        font-size: 2.4rem;
+        line-height: 1.15;
+        margin-bottom: 1rem;
+        background: linear-gradient(100deg, var(--fg) 40%, var(--teal));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      h2 {
+        font-size: 1.35rem;
+        margin-top: 2.75rem;
+        color: var(--fg);
+      }
+      h2::before {
+        content: '';
+        display: inline-block;
+        width: 0.55rem;
+        height: 0.55rem;
+        margin-right: 0.55rem;
+        border-radius: 2px;
+        background: var(--gradient);
+        vertical-align: middle;
+      }
+      p { color: var(--fg); }
+      a { color: var(--teal); }
+      a:hover { color: var(--purple); }
+      strong { color: var(--fg); }
+      ul, ol { padding-left: 1.3rem; }
+      li { margin-bottom: 0.5rem; }
+      li a { text-decoration: none; border-bottom: 1px solid rgba(79, 209, 201, 0.35); }
+      li a:hover { border-bottom-color: var(--purple); }
+      code {
+        background: rgba(79, 209, 201, 0.12);
+        color: var(--teal);
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      pre {
+        background: var(--bg-alt);
+        color: #d7e6ec;
+        padding: 1.1rem 1.25rem;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        overflow-x: auto;
+        line-height: 1.55;
+      }
+      pre code { background: none; color: inherit; padding: 0; }
+      .card {
+        border: 1px solid rgba(79, 209, 201, 0.35);
+        background: linear-gradient(160deg, rgba(79, 209, 201, 0.08), rgba(164, 140, 242, 0.06));
+        border-radius: 12px;
+        padding: 1.3rem 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+      }
+      .card strong { color: var(--teal); }
+      ::selection { background: rgba(164, 140, 242, 0.35); }
     </style>
   </body>
 </html>

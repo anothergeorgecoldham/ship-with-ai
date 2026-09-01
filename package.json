@@ -4,15 +4,20 @@
   "version": "0.1.0",
   "private": true,
   "description": "Ship with AI: Review, Secure, and Deploy with Confidence — AI Genius Season 5, Episode 3 demo site.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "demo:bootstrap": "node scripts/bootstrap-demo.mjs",
+    "demo:preflight": "node scripts/preflight-demo.mjs"
   },
   "dependencies": {
-    "astro": "^4.16.0",
+    "astro": "7.2.4",
     "marked": "0.3.19"
   }
 }
