@@ -18,6 +18,6 @@
   },
   "dependencies": {
     "astro": "7.2.4",
-    "marked": "0.3.19"
+    "marked": "18.0.11"
   }
 }
