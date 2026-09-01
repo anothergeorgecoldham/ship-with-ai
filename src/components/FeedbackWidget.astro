@@ -68,7 +68,8 @@
   import { loadSubmissions, saveSubmission } from '../lib/feedback.js';
   import { FEEDBACK_ANALYTICS_TOKEN } from '../lib/analytics-config.js';
 
-  const renderMarkdown = markedModule.marked ?? markedModule.default;
+  const renderMarkdown =
+    Reflect.get(markedModule, 'marked') ?? Reflect.get(markedModule, 'default');
 
   // Demo-only: would normally authenticate a feedback-analytics beacon.
   // FEEDBACK_ANALYTICS_TOKEN is a fake placeholder — see analytics-config.js.

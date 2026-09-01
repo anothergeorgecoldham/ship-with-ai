@@ -1,6 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { ghApi, ghJson, hasFlag, readOption, repositoryDetails, run, sleep } from './lib/cli.mjs';
 
-const CANONICAL_REPOSITORY = 'anothergeorgecoldham/ship-with-ai';
+const manifest = JSON.parse(
+  readFileSync(new URL('../demo-kit.json', import.meta.url), 'utf8'),
+);
+if (manifest.schemaVersion !== 1) {
+  throw new Error(`Unsupported demo-kit schema version: ${manifest.schemaVersion}`);
+}
+const CANONICAL_REPOSITORY = manifest.canonicalRepository;
 const args = process.argv.slice(2);
 const apply = hasFlag(args, '--apply');
 const skipDeploy = hasFlag(args, '--skip-deploy');
@@ -73,8 +80,8 @@ async function main() {
   if (details.visibility !== 'PUBLIC') {
     throw new Error('The demo repository must be public.');
   }
-  if (defaultBranch !== 'main') {
-    throw new Error('The demo repository default branch must be main.');
+  if (defaultBranch !== manifest.defaultBranch) {
+    throw new Error(`The demo repository default branch must be ${manifest.defaultBranch}.`);
   }
   if (apply && repository === CANONICAL_REPOSITORY && !allowCanonical) {
     throw new Error(

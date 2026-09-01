@@ -1,4 +1,4 @@
-export function validateAuditState(report, expectedState) {
+export function validateAuditState(report, expectedState, policy = {}) {
   if (!['start', 'clean'].includes(expectedState)) {
     return { valid: false, message: 'Expected audit state must be "start" or "clean".' };
   }
@@ -7,12 +7,14 @@ export function validateAuditState(report, expectedState) {
   const counts = report.metadata?.vulnerabilities ?? {};
 
   if (expectedState === 'start') {
+    const expectedPackages = [...(policy.packages ?? ['marked'])].sort();
+    const actualPackages = findings.map(([name]) => name).sort();
     const valid =
-      findings.length === 1 &&
-      findings[0][0] === 'marked' &&
-      findings[0][1].severity === 'high' &&
-      counts.high === 1 &&
-      counts.critical === 0;
+      actualPackages.length === expectedPackages.length &&
+      actualPackages.every((name, index) => name === expectedPackages[index]) &&
+      findings.every(([, finding]) => finding.severity === 'high') &&
+      counts.high === (policy.high ?? 1) &&
+      counts.critical === (policy.critical ?? 0);
 
     return {
       valid,
@@ -22,7 +24,9 @@ export function validateAuditState(report, expectedState) {
     };
   }
 
-  const valid = (counts.high ?? 0) === 0 && (counts.critical ?? 0) === 0;
+  const valid =
+    (counts.high ?? 0) === (policy.high ?? 0) &&
+    (counts.critical ?? 0) === (policy.critical ?? 0);
   return {
     valid,
     message: valid

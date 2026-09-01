@@ -14,6 +14,9 @@ Its security theme is **OWASP Top 10:2025 A03 — Software Supply Chain Failures
 start state intentionally contains an outdated dependency, an inactive workflow with unsafe
 defaults, and a fake secret-scanning fixture.
 
+The versioned release contract is stored in [`demo-kit.json`](./demo-kit.json). Maintainers publish
+new template versions using [`MAINTAINER-RELEASE.md`](./MAINTAINER-RELEASE.md).
+
 ## Choose your path
 
 | I want to… | Start here |

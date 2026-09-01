@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "demo-2026.09",
+  "canonicalRepository": "anothergeorgecoldham/ship-with-ai",
+  "defaultBranch": "main",
+  "runtime": {
+    "node": "24",
+    "minimumNode": "22.12.0"
+  },
+  "startState": {
+    "dependencies": {
+      "astro": "7.2.4",
+      "marked": "0.3.19"
+    },
+    "audit": {
+      "packages": [
+        "marked"
+      ],
+      "high": 1,
+      "critical": 0
+    },
+    "productionWorkflowActive": false
+  },
+  "finishedState": {
+    "minimumSafeMarkedVersion": "4.0.10",
+    "audit": {
+      "high": 0,
+      "critical": 0
+    }
+  },
+  "dependabot": {
+    "dependency": "marked",
+    "expectedOpenPullRequests": 1
+  },
+  "secretScanning": {
+    "expectedType": "http_bearer_authentication_header"
+  }
+}

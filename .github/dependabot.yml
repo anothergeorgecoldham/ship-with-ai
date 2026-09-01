@@ -4,16 +4,11 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
+    allow:
+      - dependency-name: "marked"
+        dependency-type: "direct"
     labels:
       - "dependencies"
     # Repo setting "Allow auto-merge" + Agent Merge handle merging a passing
     # version-bump PR without a human click — see PRESENTER-RUNSHEET.md Beat 4.
-
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "dependencies"
-      - "github-actions"

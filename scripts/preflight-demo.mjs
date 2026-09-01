@@ -1,12 +1,16 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { validateAuditState } from './lib/audit-state.mjs';
 import { ghApi, ghJson, hasFlag, readOption, repositoryDetails, run } from './lib/cli.mjs';
+import { versionAtLeast } from './lib/version.mjs';
 
 const args = process.argv.slice(2);
 const localOnly = hasFlag(args, '--local-only');
 const copilotConfirmed = hasFlag(args, '--confirm-copilot');
 const results = [];
 let resolvedRepository;
+const manifest = JSON.parse(
+  readFileSync(new URL('../demo-kit.json', import.meta.url), 'utf8'),
+);
 
 function record(status, label, detail = '') {
   results.push({ status, label, detail });
@@ -31,26 +35,16 @@ function check(label, operation, status = 'PASS') {
   }
 }
 
-function versionAtLeast(actual, minimum) {
-  const parse = (version) =>
-    version
-      .replace(/^v/, '')
-      .split('.')
-      .slice(0, 3)
-      .map((part) => Number.parseInt(part, 10));
-  const actualParts = parse(actual);
-  const minimumParts = parse(minimum);
-
-  for (let index = 0; index < 3; index += 1) {
-    if (actualParts[index] > minimumParts[index]) return true;
-    if (actualParts[index] < minimumParts[index]) return false;
-  }
-  return true;
-}
-
 function checkLocalState() {
-  check('Node.js 22.12 or newer', () => {
-    if (!versionAtLeast(process.version, '22.12.0')) {
+  check('Demo kit manifest schema is supported', () => {
+    if (manifest.schemaVersion !== 1) {
+      throw new Error(`Found schema version ${manifest.schemaVersion}.`);
+    }
+    return manifest.releaseId;
+  });
+
+  check(`Node.js ${manifest.runtime.minimumNode} or newer`, () => {
+    if (!versionAtLeast(process.version, manifest.runtime.minimumNode)) {
       throw new Error(`Found ${process.version}.`);
     }
     return process.version;
@@ -62,7 +56,11 @@ function checkLocalState() {
       '.github/workflows/initialize-demo.yml',
       '.github/workflows/pull-request-checks.yml',
       '.github/workflows/dependency-policy.yml',
+      'AUDIENCE-WALKTHROUGH.md',
+      'PRESENTER-RUNSHEET.md',
+      'demo-kit.json',
       'scripts/check-audit-state.mjs',
+      'src/lib/demo-secret-fixture.js',
     ];
     const missing = required.filter((path) => !existsSync(path));
     if (missing.length > 0) {
@@ -71,18 +69,27 @@ function checkLocalState() {
   });
 
   check('Production workflow is inactive before recording', () => {
-    if (existsSync('.github/workflows/deploy.yml')) {
-      throw new Error('Remove .github/workflows/deploy.yml from the start state.');
+    const isActive = existsSync('.github/workflows/deploy.yml');
+    if (isActive !== manifest.startState.productionWorkflowActive) {
+      throw new Error(
+        manifest.startState.productionWorkflowActive
+          ? 'Add .github/workflows/deploy.yml to the start state.'
+          : 'Remove .github/workflows/deploy.yml from the start state.',
+      );
     }
   });
 
   check('Dependencies match the intended start state', () => {
     const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
-    if (packageJson.dependencies?.astro !== '7.2.4') {
-      throw new Error('Astro must be pinned to 7.2.4.');
-    }
-    if (packageJson.dependencies?.marked !== '0.3.19') {
-      throw new Error('marked must be pinned to 0.3.19.');
+    const mismatches = Object.entries(manifest.startState.dependencies).filter(
+      ([name, version]) => packageJson.dependencies?.[name] !== version,
+    );
+    if (mismatches.length > 0) {
+      throw new Error(
+        mismatches
+          .map(([name, version]) => `${name} must be pinned to ${version}.`)
+          .join(' '),
+      );
     }
   });
 
@@ -93,10 +100,14 @@ function checkLocalState() {
     }
   });
 
+  check('Clean dependency installation succeeds', () => {
+    run('npm', ['ci']);
+  });
+
   check('Audit matches the intentional start state', () => {
     const audit = run('npm', ['audit', '--json'], { allowFailure: true });
     const report = JSON.parse(audit.stdout);
-    const validation = validateAuditState(report, 'start');
+    const validation = validateAuditState(report, 'start', manifest.startState.audit);
     if (!validation.valid) {
       throw new Error(validation.message);
     }
@@ -122,7 +133,10 @@ function checkRemoteState(repository) {
   resolvedRepository = details.nameWithOwner;
 
   check('Repository is public with main as default', () => {
-    if (details.visibility !== 'PUBLIC' || details.defaultBranchRef?.name !== 'main') {
+    if (
+      details.visibility !== 'PUBLIC' ||
+      details.defaultBranchRef?.name !== manifest.defaultBranch
+    ) {
       throw new Error(`Found ${details.visibility} / ${details.defaultBranchRef?.name}.`);
     }
     return resolvedRepository;
@@ -202,9 +216,13 @@ function checkRemoteState(repository) {
     );
     if (
       highAlerts.length === 0 ||
-      highAlerts.some((alert) => alert.dependency?.package?.name !== 'marked')
+      highAlerts.some(
+        (alert) => !manifest.startState.audit.packages.includes(alert.dependency?.package?.name),
+      )
     ) {
-      throw new Error('Expected only high-severity marked alerts.');
+      throw new Error(
+        `Expected only high-severity ${manifest.startState.audit.packages.join(', ')} alerts.`,
+      );
     }
     return `${highAlerts.length} marked alert(s)`;
   });
@@ -226,25 +244,33 @@ function checkRemoteState(repository) {
         pullRequest.author?.login === 'app/dependabot' ||
         pullRequest.headRefName.startsWith('dependabot/'),
     );
-    const markedPullRequests = pullRequests.filter((pullRequest) =>
-      pullRequest.headRefName.includes('marked'),
+    const expectedPullRequests = pullRequests.filter((pullRequest) =>
+      pullRequest.headRefName.includes(manifest.dependabot.dependency),
     );
-    if (pullRequests.length !== 1 || markedPullRequests.length !== 1) {
+    if (
+      pullRequests.length !== manifest.dependabot.expectedOpenPullRequests ||
+      expectedPullRequests.length !== manifest.dependabot.expectedOpenPullRequests
+    ) {
       throw new Error(
-        `Found ${pullRequests.length} Dependabot PR(s), including ${markedPullRequests.length} for marked.`,
+        `Found ${pullRequests.length} Dependabot PR(s), including ${expectedPullRequests.length} for ${manifest.dependabot.dependency}.`,
       );
     }
-    return markedPullRequests[0].url;
+    return expectedPullRequests[0].url;
   });
 
   check('Secret scanning has an open demo alert', () => {
     const alerts = ghApi(
       `repos/${resolvedRepository}/secret-scanning/alerts?state=open&per_page=100`,
     ).data;
-    if (alerts.length === 0) {
-      throw new Error('No open secret-scanning alert was found.');
+    const expectedAlerts = alerts.filter(
+      (alert) => alert.secret_type === manifest.secretScanning.expectedType,
+    );
+    if (expectedAlerts.length === 0) {
+      throw new Error(
+        `No open ${manifest.secretScanning.expectedType} secret-scanning alert was found.`,
+      );
     }
-    return `${alerts.length} open alert(s)`;
+    return `${expectedAlerts.length} expected alert(s)`;
   });
 
   if (copilotConfirmed) {

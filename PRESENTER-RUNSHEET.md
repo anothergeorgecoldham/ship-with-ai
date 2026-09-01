@@ -2,6 +2,8 @@
 
 This is the operational guide for re-delivering AI Genius S5E3 in another language or region.
 Audience members should use [`AUDIENCE-WALKTHROUGH.md`](./AUDIENCE-WALKTHROUGH.md).
+The release contract is recorded in `demo-kit.json`; do not change its versions in a presenter
+repository.
 
 ## Delivery contract
 
@@ -107,8 +109,8 @@ code itself."*
 
 - **Dependabot alert** on `marked@0.3.19` (`package.json`) — genuinely used by the feedback widget
   and affected by known regular-expression denial-of-service vulnerabilities.
-- **Secret scanning** flags the fake token in `src/lib/analytics-config.js` — clearly commented as
-  a demo placeholder, never a real credential.
+- **Secret scanning** flags the fake bearer header in `src/lib/demo-secret-fixture.js` — clearly
+  labeled as a non-functional training value, never a real credential.
 
 Open the prepared `marked` Dependabot PR. Its dependency-policy check should be green. Use Agent
 Merge to merge it, then open the new **Build and deploy** run.
@@ -138,7 +140,7 @@ GitHub Actions (build + supply-chain security + deploy) → GitHub Pages
 | Outdated `marked` dependency | `package.json` | Dependabot |
 | Unpinned Actions | `.github/workflows/deploy.yml` | Copilot Code Review |
 | Over-broad `permissions: write-all` | `.github/workflows/deploy.yml` | Copilot Code Review |
-| Fake committed token | `src/lib/analytics-config.js` | Secret scanning / push protection |
+| Fake bearer-header fixture | `src/lib/demo-secret-fixture.js` | Secret scanning |
 | Missing input validation | `src/lib/feedback.js` | Copilot Code Review |
 
 `marked` upgrades address its dependency advisories. Sanitizing untrusted rendered HTML is a
