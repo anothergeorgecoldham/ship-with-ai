@@ -5,6 +5,11 @@ Audience members should use [`AUDIENCE-WALKTHROUGH.md`](./AUDIENCE-WALKTHROUGH.m
 The release contract is recorded in `demo-kit.json`; do not change its versions in a presenter
 repository.
 
+First-time presenters must rehearse with
+[`MANUAL-DEMO-GUIDE.md`](./MANUAL-DEMO-GUIDE.md), which includes every setup command and UI action
+from template creation through the final deployment. This runsheet is the condensed recording
+view.
+
 ## Delivery contract
 
 - **Target duration:** 10–12 minutes.

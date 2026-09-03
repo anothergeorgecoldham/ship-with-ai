@@ -22,7 +22,8 @@ new template versions using [`MAINTAINER-RELEASE.md`](./MAINTAINER-RELEASE.md).
 | I want to… | Start here |
 |---|---|
 | Follow the session | [`AUDIENCE-WALKTHROUGH.md`](./AUDIENCE-WALKTHROUGH.md) |
-| Present or record the demonstration | [`PRESENTER-RUNSHEET.md`](./PRESENTER-RUNSHEET.md) |
+| Set up and rehearse the full demonstration | [`MANUAL-DEMO-GUIDE.md`](./MANUAL-DEMO-GUIDE.md) |
+| Present or record after rehearsing | [`PRESENTER-RUNSHEET.md`](./PRESENTER-RUNSHEET.md) |
 | Understand the security lesson | [`src/pages/secure-supply-chain.astro`](./src/pages/secure-supply-chain.astro) |
 | Explore the implementation | [`src/pages/pipeline.astro`](./src/pages/pipeline.astro) |
 
