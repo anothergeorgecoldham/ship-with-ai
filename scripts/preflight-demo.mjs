@@ -70,6 +70,7 @@ function checkLocalState() {
       'demo-kit.json',
       'scripts/check-audit-state.mjs',
       'src/lib/demo-secret-fixture.js',
+      'src/lib/feedback.js',
     ];
     const missing = required.filter((path) => !existsSync(path));
     if (missing.length > 0) {
@@ -84,6 +85,18 @@ function checkLocalState() {
         manifest.startState.productionWorkflowActive
           ? 'Add .github/workflows/deploy.yml to the start state.'
           : 'Remove .github/workflows/deploy.yml from the start state.',
+      );
+    }
+  });
+
+  check('Missing feedback validation is present for Code Review', () => {
+    const feedback = readFileSync('src/lib/feedback.js', 'utf8');
+    const unsafeSeed =
+      feedback.includes('export function saveSubmission(name, message)') &&
+      feedback.includes('submissions.push({ name, message,');
+    if (!unsafeSeed || /\b(trim|maxLength|length\s*[<>]=?|required)\b/.test(feedback)) {
+      throw new Error(
+        'Restore the seeded saveSubmission handler with no empty-value check or length cap.',
       );
     }
   });

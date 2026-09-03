@@ -91,6 +91,17 @@ inline comments calling out, wherever they're still present:
 - `permissions: write-all` instead of least privilege (`.github/workflows/deploy.yml`)
 - No input validation in the feedback submit handler (`src/lib/feedback.js`)
 
+### Call out the finding scanners cannot catch
+
+In the review comments, pause on the missing input-validation finding: the feedback widget accepts
+empty values and has no length cap. Contrast it with the workflow and dependency findings.
+
+Say: *"Notice this one. No scanner would have found it — it isn't a vulnerability, it's just not
+very good code. That's the difference between a scanner and a reviewer."*
+
+Preflight verifies that this finding remains in the start state. If that check fails, restore the
+seed before recording; without it, Code Review and the security beat tell the same story.
+
 **Talking point:** *"The AI as your reviewer — it reads intent, not just signatures."*
 
 ## Beat 2 — Agent Merge ⭐
@@ -108,6 +119,26 @@ Agent Merge pushes fixes for the Beat 1 findings — pin the Actions to SHAs, sc
 
 Show the now-hardened `deploy.yml` run stop at the `npm audit` gate. After the Dependabot PR is
 merged in Beat 4, the next run will complete.
+
+### Show the workflow, don't just run it
+
+Before opening the failed production run, open `.github/workflows/pull-request-checks.yml`. Point
+at only:
+
+- `on: pull_request` — *"This runs on every pull request."*
+- `npm audit --audit-level=high` — *"This reports dependency risk before merge; it is informational
+  in the seeded state so we can demonstrate the production gate."*
+- `permissions: contents: read` — *"This uses a least-privilege token, one of the things Copilot
+  told us to fix in the production workflow."*
+
+Then open the hardened `.github/workflows/deploy.yml` and point at
+`node scripts/check-audit-state.mjs clean`: *"This is the enforcement gate. It blocks deployment
+until the audit is clean."*
+
+Return to **Actions**. Do not read either file line by line.
+
+Say: *"These two short workflows are the pipeline: pull requests are checked, and only a clean
+`main` can deploy. You set it up once, and every change from now on goes through it."*
 
 **Talking point:** *"The pipeline that builds and ships your code needs the same scrutiny as the
 code itself."*
