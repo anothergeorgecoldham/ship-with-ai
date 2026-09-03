@@ -33,6 +33,7 @@
     "expectedOpenPullRequests": 1
   },
   "secretScanning": {
+    "required": false,
     "expectedType": "http_bearer_authentication_header"
   }
 }

@@ -93,7 +93,8 @@ async function main() {
     console.log('Dry run only. The following settings would be configured:');
     console.log('- auto-merge');
     console.log('- Dependabot alerts and security updates');
-    console.log('- secret scanning, push protection, and non-provider patterns');
+    console.log('- secret scanning and push protection');
+    console.log('- generic secret patterns when available for the account');
     console.log('- CodeQL default setup');
     console.log('- automatic Copilot code review on the default branch');
     console.log('- GitHub Pages with GitHub Actions');
@@ -131,7 +132,7 @@ async function main() {
     });
   });
 
-  perform('Enabled non-provider secret patterns', () => {
+  try {
     ghApi(`repos/${repository}`, {
       method: 'PATCH',
       body: {
@@ -140,7 +141,15 @@ async function main() {
         },
       },
     });
-  });
+    const settings = ghApi(`repos/${repository}`).data.security_and_analysis ?? {};
+    if (settings.secret_scanning_non_provider_patterns?.status === 'enabled') {
+      pass('Enabled optional generic secret patterns');
+    } else {
+      console.log('[INFO] Optional generic secret patterns are unavailable; continuing.');
+    }
+  } catch (error) {
+    console.log(`[INFO] Optional generic secret patterns could not be enabled: ${error.message}`);
+  }
 
   perform('Configured CodeQL default setup', () => {
     const current = ghApi(`repos/${repository}/code-scanning/default-setup`, {

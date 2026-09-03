@@ -16,7 +16,8 @@ view.
 - **Audience story:** issue → AI draft → AI review → automated fix → security gate → deployment.
 - **Start only when:** `npm run demo:preflight -- --repo <owner>/<repo> --confirm-copilot` ends
   with `READY TO RECORD`.
-- **Do not pre-fix:** the inactive production workflow, `marked@0.3.19`, or the demo secret fixture.
+- **Do not pre-fix:** the inactive production workflow or `marked@0.3.19`.
+- **Optional:** show the demo secret fixture only when Generic patterns is available.
 
 ## Translation guidance
 
@@ -41,11 +42,13 @@ talking point to one sentence so subtitles and interpretation remain aligned wit
    ```
 
 5. In repository settings, confirm the Copilot coding agent and Agent Merge are available.
-6. Wait for the `marked` Dependabot PR and demo secret-scanning alert to appear.
+6. Wait for the `marked` Dependabot PR. If Generic patterns is available, also wait for the
+   optional demo secret-scanning alert.
 7. Run preflight. Resolve every failure before recording.
 
 Bootstrap configures Pages, CodeQL, Dependabot, secret scanning, push protection, auto-merge, and
-automatic Copilot review. Repository settings are not inherited from a GitHub template.
+automatic Copilot review. It attempts to enable Generic patterns, but that optional setting is not
+available to every account. Repository settings are not inherited from a GitHub template.
 
 ## Final check before recording
 
@@ -53,6 +56,7 @@ automatic Copilot review. Repository settings are not inherited from a GitHub te
 - The feature issue has not been filed.
 - `.github/workflows/deploy.yml` does not exist yet.
 - Exactly one Dependabot PR is open, for `marked`.
+- Any Generic-pattern preflight message is informational, not blocking.
 - No unrelated browser tabs, notifications, or credentials are visible.
 - Preflight reports `READY TO RECORD`.
 
@@ -114,8 +118,11 @@ code itself."*
 
 - **Dependabot alert** on `marked@0.3.19` (`package.json`) — genuinely used by the feedback widget
   and affected by known regular-expression denial-of-service vulnerabilities.
-- **Secret scanning** flags the fake bearer header in `src/lib/demo-secret-fixture.js` — clearly
-  labeled as a non-functional training value, never a real credential.
+- **Required settings stop:** open **Settings → Security and quality → Advanced Security** and show
+  **Secret Protection** plus enabled **Push protection**. Explain that supported provider secrets
+  are detected and blocked before push.
+- **Optional:** if Generic patterns is available, show secret scanning flagging the fake bearer
+  header in `src/lib/demo-secret-fixture.js`. It is a non-functional training value.
 
 Open the prepared `marked` Dependabot PR. Its dependency-policy check should be green. Use Agent
 Merge to merge it, then open the new **Build and deploy** run.
@@ -145,7 +152,8 @@ GitHub Actions (build + supply-chain security + deploy) → GitHub Pages
 | Outdated `marked` dependency | `package.json` | Dependabot |
 | Unpinned Actions | `.github/workflows/deploy.yml` | Copilot Code Review |
 | Over-broad `permissions: write-all` | `.github/workflows/deploy.yml` | Copilot Code Review |
-| Fake bearer-header fixture | `src/lib/demo-secret-fixture.js` | Secret scanning |
+| Supported provider secrets | Repository pushes | Secret Protection and Push protection |
+| Optional fake bearer-header fixture | `src/lib/demo-secret-fixture.js` | Generic secret scanning, when available |
 | Missing input validation | `src/lib/feedback.js` | Copilot Code Review |
 
 `marked` upgrades address its dependency advisories. Sanitizing untrusted rendered HTML is a
@@ -158,7 +166,8 @@ separate application-security concern and is not part of the core recording.
 | Copilot changes dependencies | Ask it to revert `package.json` and `package-lock.json` before review |
 | Expected review comment is missing | Request one re-review; then show the seeded line and explain the expected finding |
 | Feature PR check is red | Stop and diagnose; do not bypass required build checks |
-| Dependabot PR or secret alert is missing | Stop and rerun preflight after GitHub finishes scanning |
+| Dependabot PR is missing | Stop and rerun preflight after GitHub finishes scanning |
+| Generic patterns or its alert is unavailable | Continue and omit the optional secret-scanning beat |
 | Agent Merge is unavailable | Use the prepared fallback recording; do not silently substitute a manual merge |
 | Final deployment fails | Keep the failed run visible and switch to the prepared successful-run recording |
 

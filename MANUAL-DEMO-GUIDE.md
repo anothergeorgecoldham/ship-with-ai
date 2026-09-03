@@ -89,7 +89,8 @@ Bootstrap enables:
 
 - auto-merge;
 - Dependabot alerts and security updates;
-- secret scanning, generic non-provider patterns, and push protection;
+- secret scanning and push protection;
+- Generic patterns when that optional setting is available;
 - CodeQL default setup;
 - automatic Copilot Code Review;
 - GitHub Pages using GitHub Actions;
@@ -120,6 +121,8 @@ restrictions that an API response cannot prove.
 5. Under **Pages**, confirm **Source** is **GitHub Actions**.
 6. Under **Security** or **Security and quality**, confirm Dependabot, code scanning, secret
    scanning, and push protection are enabled.
+7. Under **Advanced Security → Secret Protection**, look for **Generic patterns**. Enable it if it
+   is available. If it is not shown, continue without the optional secret-scanning beat.
 
 ### Coding agent and Agent Merge
 
@@ -141,12 +144,13 @@ GitHub needs time to scan a new template repository.
 2. Wait for exactly one Dependabot pull request updating `marked`.
 3. Open **Security** or **Security and quality**.
 4. Under **Dependabot**, confirm the high-severity alerts refer only to `marked`.
-5. Under **Secret scanning**, confirm an open generic HTTP bearer-header alert points to
-   `src/lib/demo-secret-fixture.js`.
+5. If Generic patterns is available, confirm an open HTTP bearer-header alert points to
+   `src/lib/demo-secret-fixture.js`. Otherwise, omit this optional check.
 6. Under **Actions**, confirm **Initialize demo site** succeeded.
 7. Open the Pages URL from that run and confirm the initial site loads.
 
-Do not merge or dismiss either prepared finding.
+Do not merge or dismiss the prepared Dependabot finding. If the optional secret alert exists, do
+not dismiss it before recording.
 
 ## 7. Run recording preflight
 
@@ -161,6 +165,9 @@ Resolve every failure. Do not record until the final line is:
 ```text
 READY TO RECORD
 ```
+
+`[INFO]` messages about unavailable Generic patterns or a missing demo secret alert do not block
+the recording.
 
 Close unrelated tabs and notifications. Keep open:
 
@@ -259,16 +266,24 @@ Do not rerun the failed workflow; it should remain as evidence of the blocked st
 
 1. Open **Security** or **Security and quality**.
 2. Under **Dependabot**, show the `marked@0.3.19` advisories.
-3. Under **Secret scanning**, show the generic bearer-header training fixture.
-4. State clearly that it is a non-functional test value, not a credential.
-5. Open **Pull requests** and select the prepared Dependabot `marked` update.
-6. Show its green **Dependency policy** and **Pull request checks**.
-7. Open that pull request in the GitHub Copilot app **My work** view.
-8. Enable **Agent merge** and permit **Merge pull request**.
-9. Wait for the dependency pull request to merge.
+3. Open **Settings → Security and quality → Advanced Security**.
+4. Under **Secret Protection**, show that secret scanning is enabled.
+5. Show that **Push protection** is enabled and explain that it blocks supported provider secrets
+   before they reach the repository.
+6. If **Generic patterns** is shown, explain that it extends detection beyond provider secrets.
+   If it is absent, state that availability varies by account and the core protection is still
+   enabled.
+7. Optional: if Generic patterns produced the training alert, open **Secret scanning** and show the
+   bearer-header fixture. State clearly that it is a non-functional test value.
+8. Open **Pull requests** and select the prepared Dependabot `marked` update.
+9. Show its green **Dependency policy** and **Pull request checks**.
+10. Open that pull request in the GitHub Copilot app **My work** view.
+11. Enable **Agent merge** and permit **Merge pull request**.
+12. Wait for the dependency pull request to merge.
 
 **Expected result:** the dependency update is independently generated, checked, and merged without
-weakening the production gate.
+weakening the production gate. The audience also sees where Secret Protection and Push protection
+are configured, regardless of Generic-pattern availability.
 
 ## 13. Record Beat 5 — successful deployment
 
@@ -308,7 +323,9 @@ The canonical template remains unchanged and ready for the next presenter.
 | Bootstrap targets the canonical repository | Stop and recreate/clone a disposable template repository |
 | Initialization cannot find its workflow | Confirm the template repository uses `main` and contains `.github/workflows/initialize-demo.yml` |
 | More than one Dependabot PR appears | Do not record; create a fresh template repository and rerun preflight |
-| `marked` PR or secret alert is missing | Wait for GitHub scanning, then rerun preflight |
+| `marked` PR is missing | Wait for GitHub scanning, then rerun preflight |
+| Generic patterns is absent | Continue and omit the optional secret-scanning beat |
+| Generic patterns is enabled but its alert is missing | Continue after preflight reports this as informational |
 | Copilot is absent from **Assignees** | Confirm the coding-agent license, feature setting, organization policy, and repository access |
 | Automatic review is absent | Request Copilot from the PR **Reviewers** sidebar once |
 | Agent Merge is absent | Use the GitHub Copilot app, confirm repository access and auto-merge, then verify the Copilot plan |

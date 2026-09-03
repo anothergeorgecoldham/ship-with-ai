@@ -31,6 +31,11 @@ Use this page to follow the demonstration without needing to configure a reposit
 
 No single AI decision is treated as sufficient to ship.
 
+Some presenters may also show Generic secret scanning. That is an optional extension because the
+setting is not available to every account; it is not required for the six-stage lifecycle.
+Every demonstration still shows where **Secret Protection** and **Push protection** are configured
+and explains how they detect supported provider secrets and block them before push.
+
 ## Why the deployment fails once
 
 The start state deliberately uses `marked@0.3.19`, which has known regular-expression

@@ -5,8 +5,8 @@ This procedure publishes the canonical start state. It is for maintainers, not p
 ## Release contract
 
 `demo-kit.json` is the source of truth for the release identifier, runtime, dependency versions,
-expected audit state, Dependabot behavior, and secret-scanning signal. Update it only as part of a
-fully recertified release.
+expected audit state, Dependabot behavior, and optional secret-scanning signal. Update it only as
+part of a fully recertified release.
 
 The canonical repository always publishes the **start state**. The finished state is produced in
 each disposable demonstration repository and retained in that repository's pull requests and
@@ -42,7 +42,7 @@ point at the certified start state.
 1. Create a new public repository with **Use this template**.
 2. Clone the new repository and run `npm ci`.
 3. Run bootstrap in dry-run mode, then with `--apply`.
-4. Wait for Dependabot and secret scanning.
+4. Wait for Dependabot. If Generic patterns is available, also wait for the optional secret alert.
 5. Require `READY TO RECORD` from full preflight.
 6. Perform the complete presenter runsheet twice.
 7. Retain the successful disposable repository as the finished-state reference for this release.

@@ -35,6 +35,15 @@ function check(label, operation, status = 'PASS') {
   }
 }
 
+function optionalCheck(label, operation) {
+  try {
+    const result = operation();
+    record('PASS', label, typeof result === 'string' ? result : '');
+  } catch (error) {
+    record('INFO', label, error.message);
+  }
+}
+
 function checkLocalState() {
   check('Demo kit manifest schema is supported', () => {
     if (manifest.schemaVersion !== 1) {
@@ -131,6 +140,7 @@ function checkLocalState() {
 function checkRemoteState(repository) {
   const details = repositoryDetails(repository);
   resolvedRepository = details.nameWithOwner;
+  const checkSecretScanningBeat = manifest.secretScanning.required ? check : optionalCheck;
 
   check('Repository is public with main as default', () => {
     if (
@@ -149,15 +159,20 @@ function checkRemoteState(repository) {
       ['auto-merge', data.allow_auto_merge === true],
       ['secret scanning', security.secret_scanning?.status === 'enabled'],
       ['push protection', security.secret_scanning_push_protection?.status === 'enabled'],
-      [
-        'non-provider patterns',
-        security.secret_scanning_non_provider_patterns?.status === 'enabled',
-      ],
       ['Dependabot security updates', security.dependabot_security_updates?.status === 'enabled'],
     ];
     const disabled = required.filter(([, enabled]) => !enabled).map(([name]) => name);
     if (disabled.length > 0) {
       throw new Error(`Not enabled: ${disabled.join(', ')}`);
+    }
+  });
+
+  checkSecretScanningBeat('Optional generic secret patterns', () => {
+    const data = ghApi(`repos/${resolvedRepository}`).data;
+    if (
+      data.security_and_analysis?.secret_scanning_non_provider_patterns?.status !== 'enabled'
+    ) {
+      throw new Error('Unavailable for this repository; omit the optional secret-scanning beat.');
     }
   });
 
@@ -258,7 +273,7 @@ function checkRemoteState(repository) {
     return expectedPullRequests[0].url;
   });
 
-  check('Secret scanning has an open demo alert', () => {
+  checkSecretScanningBeat('Optional demo secret-scanning alert', () => {
     const alerts = ghApi(
       `repos/${resolvedRepository}/secret-scanning/alerts?state=open&per_page=100`,
     ).data;
@@ -267,7 +282,7 @@ function checkRemoteState(repository) {
     );
     if (expectedAlerts.length === 0) {
       throw new Error(
-        `No open ${manifest.secretScanning.expectedType} secret-scanning alert was found.`,
+        `No ${manifest.secretScanning.expectedType} alert; omit the optional secret-scanning beat.`,
       );
     }
     return `${expectedAlerts.length} expected alert(s)`;

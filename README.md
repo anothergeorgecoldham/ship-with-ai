@@ -12,7 +12,9 @@ GitHub Actions security gate → Dependabot remediation → GitHub Pages
 
 Its security theme is **OWASP Top 10:2025 A03 — Software Supply Chain Failures**. The recordable
 start state intentionally contains an outdated dependency, an inactive workflow with unsafe
-defaults, and a fake secret-scanning fixture.
+defaults, and an optional fake secret-scanning fixture. The core demonstration does not require
+Generic patterns, because that setting is not available to every presenter. Presenters still show
+where Secret Protection and Push protection are configured.
 
 The versioned release contract is stored in [`demo-kit.json`](./demo-kit.json). Maintainers publish
 new template versions using [`MAINTAINER-RELEASE.md`](./MAINTAINER-RELEASE.md).
