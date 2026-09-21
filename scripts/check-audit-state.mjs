@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
-import { validateAuditState } from './lib/audit-state.mjs';
+import { resolveAuditState, validateAuditState } from './lib/audit-state.mjs';
 import { versionAtLeast } from './lib/version.mjs';
 
-const [expectedState, reportPath = 'audit.json'] = process.argv.slice(2);
+const [requestedState, reportPath = 'audit.json'] = process.argv.slice(2);
 
 const report = JSON.parse(readFileSync(reportPath, 'utf8'));
 const manifest = JSON.parse(
@@ -11,6 +11,10 @@ const manifest = JSON.parse(
 if (manifest.schemaVersion !== 1) {
   throw new Error(`Unsupported demo-kit schema version: ${manifest.schemaVersion}`);
 }
+const packageJson = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+);
+const expectedState = resolveAuditState(requestedState, packageJson, manifest);
 const policy =
   expectedState === 'start' ? manifest.startState.audit : manifest.finishedState.audit;
 const result = validateAuditState(report, expectedState, policy);
@@ -20,9 +24,6 @@ if (!result.valid) {
 }
 
 if (expectedState === 'clean') {
-  const packageJson = JSON.parse(
-    readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
-  );
   const actualVersion = packageJson.dependencies?.marked;
   if (
     !actualVersion ||

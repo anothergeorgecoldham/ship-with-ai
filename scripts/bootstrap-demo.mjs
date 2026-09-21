@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { ghApi, ghJson, hasFlag, readOption, repositoryDetails, run, sleep } from './lib/cli.mjs';
+import { assertMergeRuleset, mergeRuleset } from './lib/merge-rules.mjs';
 
 const manifest = JSON.parse(
   readFileSync(new URL('../demo-kit.json', import.meta.url), 'utf8'),
@@ -92,6 +93,8 @@ async function main() {
   if (!apply) {
     console.log('Dry run only. The following settings would be configured:');
     console.log('- auto-merge');
+    console.log('- require build and audit from GitHub Actions before merging to the default branch');
+    console.log('- require pull requests with zero approvals, no bypass, no deletions or force pushes');
     console.log('- Dependabot alerts and security updates');
     console.log('- secret scanning and push protection');
     console.log('- generic secret patterns when available for the account');
@@ -217,6 +220,24 @@ async function main() {
     } else {
       throw new Error(pages.stderr || 'Unable to inspect GitHub Pages.');
     }
+  });
+
+  perform('Required build and audit before merge', () => {
+    const rulesets = ghJson([
+      'api',
+      `repos/${repository}/rulesets?includes_parents=false&per_page=100`,
+      '--paginate',
+      '--slurp',
+    ]).data.flat();
+    const existing = rulesets.find((ruleset) => ruleset.name === mergeRuleset.name);
+    const endpoint = existing
+      ? `repos/${repository}/rulesets/${existing.id}`
+      : `repos/${repository}/rulesets`;
+    const saved = ghApi(endpoint, {
+      method: existing ? 'PUT' : 'POST',
+      body: mergeRuleset,
+    }).data;
+    assertMergeRuleset(ghApi(`repos/${repository}/rulesets/${saved.id}`).data);
   });
 
   if (failures.length > 0) {

@@ -1,10 +1,26 @@
+export function resolveAuditState(requestedState, packageJson, manifest) {
+  if (requestedState !== 'auto') {
+    return requestedState;
+  }
+  return packageJson.dependencies?.marked === manifest.startState.dependencies.marked
+    ? 'start'
+    : 'clean';
+}
+
 export function validateAuditState(report, expectedState, policy = {}) {
   if (!['start', 'clean'].includes(expectedState)) {
     return { valid: false, message: 'Expected audit state must be "start" or "clean".' };
   }
 
+  const counts = report?.metadata?.vulnerabilities;
+  if (
+    report?.error ||
+    !counts ||
+    ![counts.high, counts.critical].every((count) => Number.isInteger(count) && count >= 0)
+  ) {
+    return { valid: false, message: 'Audit report is missing valid vulnerability counts or contains an error.' };
+  }
   const findings = Object.entries(report.vulnerabilities ?? {});
-  const counts = report.metadata?.vulnerabilities ?? {};
 
   if (expectedState === 'start') {
     const expectedPackages = [...(policy.packages ?? ['marked'])].sort();

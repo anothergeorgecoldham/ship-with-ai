@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { validateAuditState } from './lib/audit-state.mjs';
 import { ghApi, ghJson, hasFlag, readOption, repositoryDetails, run } from './lib/cli.mjs';
 import { versionAtLeast } from './lib/version.mjs';
+import { assertMergeRuleset, mergeRuleset } from './lib/merge-rules.mjs';
 
 const args = process.argv.slice(2);
 const localOnly = hasFlag(args, '--local-only');
@@ -214,6 +215,20 @@ function checkRemoteState(repository) {
       throw new Error('Pages is not configured for a workflow deployment.');
     }
     return pages.html_url;
+  });
+
+  check('Default branch requires build and audit from GitHub Actions', () => {
+    const rulesets = ghJson([
+      'api',
+      `repos/${resolvedRepository}/rulesets?includes_parents=false&per_page=100`,
+      '--paginate',
+      '--slurp',
+    ]).data.flat();
+    const ruleset = rulesets.find((item) => item.name === mergeRuleset.name);
+    if (!ruleset) {
+      throw new Error('Merge ruleset is missing; rerun bootstrap with --apply.');
+    }
+    assertMergeRuleset(ghApi(`repos/${resolvedRepository}/rulesets/${ruleset.id}`).data);
   });
 
   check('Before-site initialization completed', () => {

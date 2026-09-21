@@ -88,6 +88,8 @@ npm run demo:bootstrap -- --repo <owner>/<repository> --apply
 Bootstrap enables:
 
 - auto-merge;
+- a default-branch ruleset requiring `build` and `audit` from GitHub Actions, with zero required
+  approvals, no bypass actors, and deletion and force-push protection;
 - Dependabot alerts and security updates;
 - secret scanning and push protection;
 - Generic patterns when that optional setting is available;
@@ -123,6 +125,51 @@ restrictions that an API response cannot prove.
    scanning, and push protection are enabled.
 7. Under **Advanced Security → Secret Protection**, look for **Generic patterns**. Enable it if it
    is available. If it is not shown, continue without the optional secret-scanning beat.
+
+### Branch rules and auto-merge
+
+Configure each repository created from the template explicitly; template rulesets and settings
+are not assumed to carry over. Bootstrap creates or updates the following ruleset. Under
+**Settings → Rules → Rulesets**, confirm it matches:
+
+| Setting | Value |
+|---|---|
+| Name | `Require build and audit before merge` |
+| Enforcement status | **Active** |
+| Target branches | **Default branch** |
+| Bypass list | Empty |
+| Restrict deletions | Enabled |
+| Block force pushes | Enabled |
+| Require a pull request before merging | Enabled |
+| Required approvals | `0` |
+| Require code owner review / approval of the most recent push | Disabled |
+| Require conversation resolution | Disabled |
+| Require status checks to pass | Enabled |
+| Required checks | `build` and `audit`, sourced from **GitHub Actions** |
+| Require branches to be up to date before merging | Disabled |
+
+If it is missing or incorrect, rerun bootstrap with `--apply` (add `--skip-deploy` to avoid
+reinitializing the site), or create/update it manually. If the manual check picker does not list
+`build` and `audit`, open a setup PR, let the workflows run, then select those exact check names.
+Bootstrap configures them through the API without waiting for the picker.
+
+Use the updated template workflows as well as the ruleset. **Dependency policy** must run on
+every PR to `main`, without `paths` or `paths-ignore` filters. Otherwise a feature-only PR will
+wait indefinitely for `audit`. Bootstrap changes repository settings, not files in an older copy
+of the template; bring the updated workflow and audit scripts into that repository before
+enabling the ruleset.
+
+The required `audit` check preserves the teaching sequence: ordinary PRs with the seeded
+`marked` version must match the intentional start-state findings. Dependabot PRs, and ordinary
+PRs after remediation, require the clean state. The production gate always requires the clean
+state. A green demo PR therefore does not mean the seeded dependency is safe for production.
+
+For GitHub's native auto-merge, mark the PR ready for review and, while required checks are pending
+or failing, select **Enable auto-merge** and confirm the merge method. If all requirements already
+pass, immediate merge is expected. Do not depend on catching a waiting window during recording.
+Auto-merge is enabled per PR, manually or through separate automation; the repository setting
+does not opt in every PR. Agent Merge in the Copilot app is a separate workflow used below.
+Automatic Copilot review remains independent and does not require a human approval.
 
 ### Coding agent and Agent Merge
 
@@ -236,7 +283,8 @@ GitHub reference:
    ```
 
 4. Review the resulting diff.
-5. Wait for **Pull request checks** to pass.
+5. Confirm both **Pull request checks** (`build`) and **Dependency policy** (`audit`) are running
+   or have passed.
 6. In the session, open the dropdown beside **Create PR** or the current PR action.
 7. Select **Agent merge**, then select the **Agent merge** button.
 8. Open its dropdown and permit **Address reviews**, **Fix CI failures**, **Resolve conflicts**, and
@@ -244,6 +292,9 @@ GitHub reference:
 9. Keep the session visible until GitHub merges the pull request.
 
 **Expected result:** Agent Merge lands the reviewed feature PR after required checks pass.
+
+If using native GitHub auto-merge instead, enable it while checks are pending. If everything is
+already green, use immediate merge after reviewing the diff; this is not a demo failure.
 
 GitHub reference:
 [Managing issues and pull requests with the GitHub Copilot app](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests).
@@ -329,6 +380,9 @@ The canonical template remains unchanged and ready for the next presenter.
 | Copilot is absent from **Assignees** | Confirm the coding-agent license, feature setting, organization policy, and repository access |
 | Automatic review is absent | Request Copilot from the PR **Reviewers** sidebar once |
 | Agent Merge is absent | Use the GitHub Copilot app, confirm repository access and auto-merge, then verify the Copilot plan |
+| **Enable auto-merge** is absent | Confirm the PR is non-draft, **Allow auto-merge** is enabled, and the active ruleset requires `build` and `audit`; if everything already passes, use immediate merge |
+| `audit` remains **Expected** with no run | Remove dependency-path filters from **Dependency policy** using the updated template workflow, then push a new commit to trigger both checks; rerunning a skipped workflow is not sufficient |
+| Preflight reports missing or incorrect merge rules | Rerun bootstrap with `--apply --skip-deploy`, then confirm the ruleset above; do not bypass it |
 | Feature PR changes dependencies | Ask Copilot to revert `package.json` and `package-lock.json` |
 | Feature PR checks fail | Diagnose before recording; do not bypass required checks |
 | Final deploy fails | Preserve the failed run and use the approved fallback recording |

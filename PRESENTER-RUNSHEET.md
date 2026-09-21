@@ -41,13 +41,15 @@ talking point to one sentence so subtitles and interpretation remain aligned wit
    npm run demo:bootstrap -- --repo <owner>/<repo> --apply
    ```
 
-5. In repository settings, confirm the Copilot coding agent and Agent Merge are available.
+5. In repository settings, confirm the Copilot coding agent and Agent Merge are available, and
+   the active default-branch ruleset requires `build` and `audit` from GitHub Actions.
 6. Wait for the `marked` Dependabot PR. If Generic patterns is available, also wait for the
    optional demo secret-scanning alert.
 7. Run preflight. Resolve every failure before recording.
 
-Bootstrap configures Pages, CodeQL, Dependabot, secret scanning, push protection, auto-merge, and
-automatic Copilot review. It attempts to enable Generic patterns, but that optional setting is not
+Bootstrap configures Pages, CodeQL, Dependabot, secret scanning, push protection, auto-merge,
+required `build` and `audit` checks with zero required human approvals, and automatic Copilot
+review. It attempts to enable Generic patterns, but that optional setting is not
 available to every account. Repository settings are not inherited from a GitHub template.
 
 ## Final check before recording
@@ -56,6 +58,7 @@ available to every account. Repository settings are not inherited from a GitHub 
 - The feature issue has not been filed.
 - `.github/workflows/deploy.yml` does not exist yet.
 - Exactly one Dependabot PR is open, for `marked`.
+- Both `build` and `audit` are required; `audit` runs even on feature-only PRs.
 - Any Generic-pattern preflight message is informational, not blocking.
 - No unrelated browser tabs, notifications, or credentials are visible.
 - Preflight reports `READY TO RECORD`.
@@ -82,7 +85,8 @@ If it changes `package.json` or `package-lock.json`, ask it to revert those file
 ## Beat 1 — GitHub Copilot Code Review
 
 **Time:** 2 minutes. Open the Copilot-authored PR and show that the build check is green while the
-dependency audit is informational.
+raw dependency audit in the build job is informational. The separate required `audit` check
+enforces the expected demo state rather than requiring remediation before the feature merge.
 
 The activated workflow and updated feedback handler are both in the PR diff. Copilot should leave
 inline comments calling out, wherever they're still present:
@@ -110,6 +114,11 @@ seed before recording; without it, Code Review and the security beat tell the sa
 
 Agent Merge pushes fixes for the Beat 1 findings — pin the Actions to SHAs, scope the
 `permissions` block, add validation — and merges once checks are green.
+
+Do not wait for a deliberate pause: `build` and `audit` may finish before you reach the merge
+controls. If using GitHub's native **Enable auto-merge**, enable it per non-draft PR while checks
+are pending; if all requirements already pass, immediate merge is a successful outcome.
+Automatic Copilot review is independent and requires no human approval.
 
 **Talking point:** *"Review findings become verified changes, not another manual handoff."*
 

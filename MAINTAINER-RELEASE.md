@@ -25,6 +25,10 @@ Do not publish while preflight reports a local failure.
 The successful **Initialize demo site** run in a fresh template repository is the authoritative
 public npm-registry check; local environments may use an approved registry proxy.
 
+After changing bootstrap, merge rules, or dependency policy, run
+`node --test scripts/demo-setup.test.mjs` before certification. These offline regressions cover
+ruleset drift, the intentional start state, clean follow-up PRs, and failed audit reports.
+
 ## Publish the start reference
 
 Create and push an annotated tag matching `releaseId` with `-start` appended:

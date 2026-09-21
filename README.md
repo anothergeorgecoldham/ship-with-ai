@@ -78,6 +78,20 @@ Apply them only after confirming the target:
 npm run demo:bootstrap -- --repo <owner>/<repository> --apply
 ```
 
+Bootstrap enables auto-merge and creates an active default-branch ruleset requiring the `build`
+and `audit` checks from GitHub Actions, with zero required human approvals. It also prevents
+default-branch deletion and force pushes, with no bypass actors. Template settings and rulesets
+are not assumed to carry over.
+
+The `audit` check runs on every PR to `main`. It permits only the intended vulnerable start state
+while `marked` remains at its seeded version; Dependabot updates and PRs after remediation must
+pass the clean-state policy. Production deployment always requires the clean state.
+
+Auto-merge must still be enabled per non-draft PR; it does not opt in every PR automatically.
+If checks have already passed, immediate merge is normal. See
+[branch rules and auto-merge setup](./MANUAL-DEMO-GUIDE.md#branch-rules-and-auto-merge)
+for manual verification and recovery.
+
 Before recording, manually confirm the Copilot coding agent and Agent Merge are available, then
 run:
 
