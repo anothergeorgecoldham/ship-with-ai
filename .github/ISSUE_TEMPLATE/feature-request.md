@@ -30,6 +30,11 @@ live, including whatever the widget looked like by the end of the demo.
 
 ## Notes for the assignee
 
-Assign this to the Copilot coding agent. Keep the content and widget changes focused; do not
-redesign the site, change dependencies or the lockfile, or harden the provided workflow before
-review.
+For the presenter Agent Merge walkthrough, open this issue in the Copilot app's **My work**,
+start an implementation session, and keep that same session through PR creation, review fixes,
+and Agent Merge. Creating the issue alone does not create a PR. Do not also assign it to the
+cloud coding agent and produce a duplicate implementation.
+
+Keep the content and widget changes focused; do not redesign the site, change dependencies or
+the lockfile, or harden the provided workflow or feedback validation before review. Stop for
+diff inspection before creating the PR. Include `Closes #<issue-number>` in the PR description.

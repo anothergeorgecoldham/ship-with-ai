@@ -41,8 +41,10 @@ talking point to one sentence so subtitles and interpretation remain aligned wit
    npm run demo:bootstrap -- --repo <owner>/<repo> --apply
    ```
 
-5. In repository settings, confirm the Copilot coding agent and Agent Merge are available, and
-   the active default-branch ruleset requires `build` and `audit` from GitHub Actions.
+5. Confirm the active default-branch ruleset requires `build` and `audit` from GitHub Actions.
+   In a separate rehearsal, confirm **Agent merge** appears in the **Create PR** dropdown of a
+   feature implementation session with changes. This is an app check, not a repository setting
+   or a check of a Dependabot review session.
 6. Wait for the `marked` Dependabot PR. If Generic patterns is available, also wait for the
    optional demo secret-scanning alert.
 7. Run preflight. Resolve every failure before recording.
@@ -59,6 +61,8 @@ available to every account. Repository settings are not inherited from a GitHub 
 - `.github/workflows/deploy.yml` does not exist yet.
 - Exactly one Dependabot PR is open, for `marked`.
 - Both `build` and `audit` are required; `audit` runs even on feature-only PRs.
+- The implementation-session **Create PR → Agent merge** route has been rehearsed. Do not
+  confuse a **Submit review** session or GitHub's **Enable auto-merge** with that route.
 - Any Generic-pattern preflight message is informational, not blocking.
 - No unrelated browser tabs, notifications, or credentials are visible.
 - Preflight reports `READY TO RECORD`.
@@ -77,8 +81,20 @@ lesson wording if required; preserve filenames and acceptance criteria.
 > provided workflow. Acceptance criteria: new/updated page renders under the site nav; feedback
 > widget captures the topic and renders a submission end-to-end; `npm run build` succeeds.
 
-Assign it to the **Copilot coding agent**. It drafts the implementation and opens a PR.
-If it changes `package.json` or `package-lock.json`, ask it to revert those files before review.
+Creating the issue alone does not create a PR. Use this sequence:
+
+1. Create the issue, then open it in the Copilot app's **My work** and select **New session**.
+   Use a local worktree implementation session; do not also assign the issue to the cloud agent.
+2. Ask Copilot to implement the issue, preserve the seeded review findings, and stop for diff
+   inspection without committing, pushing, or creating/merging a PR.
+3. Inspect the diff. If `package.json` or `package-lock.json` changed, have it revert those files.
+4. Open the **Create PR** dropdown and show **Agent merge** is available, but leave **Create PR**
+   selected. Click the main **Create PR** button to publish the non-draft feature PR, linking
+   the issue with `Closes #<issue-number>`.
+5. Keep this original implementation session open through Beats 1 and 2.
+
+Cloud assignment can also generate a PR, but it is an alternative path. Opening that PR in a
+new review session may show **Submit review**, not the authoring controls used in this walkthrough.
 
 **Talking point:** *"AI wrote it fast, and even wired the pipeline — but would you ship it as-is?"*
 
@@ -112,13 +128,23 @@ seed before recording; without it, Code Review and the security beat tell the sa
 
 **Time:** 2 minutes.
 
-Agent Merge pushes fixes for the Beat 1 findings — pin the Actions to SHAs, scope the
-`permissions` block, add validation — and merges once checks are green.
+1. Return to the **original feature implementation session**, not a new PR-review session.
+2. Ask Copilot to address the review findings: pin Actions to SHAs, scope permissions, and add
+   validation. Inspect the fixes and have it commit/push them to the same PR, without changing
+   dependencies.
+3. Open the PR-action dropdown, select **Agent merge**, and show the button label changing.
+4. Click the main **Agent merge** button to start it for the linked feature PR.
+5. Show its permitted actions. Allow review/CI/conflict fixes as needed, and permit **Merge pull
+   request** only when ready to land the inspected changes. If merge permission is already on,
+   complete the inspection before starting.
+6. Show the agent checking the PR, then the PR's **Merged** state after required checks pass.
 
-Do not wait for a deliberate pause: `build` and `audit` may finish before you reach the merge
-controls. If using GitHub's native **Enable auto-merge**, enable it per non-draft PR while checks
-are pending; if all requirements already pass, immediate merge is a successful outcome.
-Automatic Copilot review is independent and requires no human approval.
+**Say explicitly:** *"This is Agent Merge in the Copilot app, not GitHub's Enable auto-merge.
+GitHub enforces the checks; the agent manages the permitted follow-up work and merge."*
+
+Do not depend on a visible waiting window. Agent Merge can act when checks are already green,
+and the merge may happen quickly. Automatic Copilot review is independent and requires no human
+approval. A manual merge or native auto-merge is not a substitute for showing this beat.
 
 **Talking point:** *"Review findings become verified changes, not another manual handoff."*
 
@@ -164,8 +190,10 @@ code itself."*
 - **Optional:** if Generic patterns is available, show secret scanning flagging the fake bearer
   header in `src/lib/demo-secret-fixture.js`. It is a non-functional training value.
 
-Open the prepared `marked` Dependabot PR. Its dependency-policy check should be green. Use Agent
-Merge to merge it, then open the new **Build and deploy** run.
+Open the prepared `marked` Dependabot PR, show its green checks, inspect the diff, and merge it
+on GitHub. Then open the new **Build and deploy** run. This is the dependency-remediation step;
+Agent Merge was demonstrated on the feature PR in Beat 2. Do not assume a Dependabot session
+with **Submit review** exposes Agent Merge. Only use that alternative if separately rehearsed.
 
 **Talking point:** *"This is the supply-chain layer — distinct from Beat 1's code review."*
 
@@ -208,6 +236,8 @@ separate application-security concern and is not part of the core recording.
 | Feature PR check is red | Stop and diagnose; do not bypass required build checks |
 | Dependabot PR is missing | Stop and rerun preflight after GitHub finishes scanning |
 | Generic patterns or its alert is unavailable | Continue and omit the optional secret-scanning beat |
+| Toolbar shows **Submit review** | Return to the original feature implementation session; do not use the Dependabot review session to demonstrate the authoring controls |
+| Empty session has no **Create PR** | Implement the feature first, then inspect the PR-action dropdown once changes are ready |
 | Agent Merge is unavailable | Use the prepared fallback recording; do not silently substitute a manual merge |
 | Final deployment fails | Keep the failed run visible and switch to the prepared successful-run recording |
 

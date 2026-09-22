@@ -173,15 +173,23 @@ Automatic Copilot review remains independent and does not require a human approv
 
 ### Coding agent and Agent Merge
 
-1. Start creating an issue, open **Assignees**, and confirm **Copilot** is available. Cancel without
-   creating the issue.
-2. Open the [GitHub Copilot app](https://github.com/copilot).
-3. Open **My work** and confirm the disposable repository is accessible.
-4. Confirm a session offers **Agent merge** in the dropdown beside **Create PR** or the pull request
-   action. Do not start it.
+1. Open the [GitHub Copilot app](https://github.com/copilot).
+2. Open **My work** and confirm the disposable repository and its issues are accessible.
+3. During a separate rehearsal, start an implementation session from the feature issue and let
+   it produce the feature changes, as described in Step 8.
+4. In that implementation session, open the arrow beside **Create PR**. Confirm **Agent merge**
+   is listed. Inspect only; do not select the main action button to start a merge.
+5. Keep the recording repository in its untouched start state; do not reuse a repository whose
+   feature or dependency PR has already been merged.
 
-If either Copilot assignment or Agent Merge is missing, stop. Check the license, organization
-policy, repository access, and Copilot feature settings before continuing.
+An empty session may not expose **Create PR** yet. A session opened from someone else's PR,
+including Dependabot's, may show **Submit review** instead. Neither screen confirms Agent Merge
+availability. Use the feature's original implementation session with changes, not a PR-review
+session, for this check.
+
+If Agent Merge is still missing there, stop and check the app version, Copilot plan, repository
+access, and organization policy. Repository rules alone cannot prove that the app control is
+available.
 
 ## 6. Wait for security preparation
 
@@ -225,16 +233,35 @@ Close unrelated tabs and notifications. Keep open:
 
 ## 8. Record Beat 0 — issue to pull request
 
+Creating the issue does not itself create a PR. In this walkthrough, the issue supplies the
+requirements, the Copilot app session implements them, and **Create PR** publishes the changes.
+Keep that same implementation session open through review and Agent Merge.
+
 1. In the disposable repository, select **Issues → New issue**.
 2. Select **Get started** for the **Feature request** template.
 3. Translate the issue title and lesson prose if needed.
 4. Do not translate filenames, commands, dependency names, or acceptance criteria.
 5. Select **Create** or **Submit new issue**.
-6. In the issue sidebar, select **Assignees**.
-7. Select **Copilot**, add no extra scope, and confirm the assignment.
-8. Show that Copilot has started work.
-9. Open **Agents** on GitHub, or open **My work** in the Copilot app, and select the new session.
-10. Wait for Copilot to open its pull request.
+6. In the Copilot app, open **My work**, find that issue, and select **New session**. Use a local
+   worktree implementation session so the default branch remains unchanged.
+7. Ask the session to implement the issue:
+
+   ```text
+   Implement this issue's lesson and feedback-widget changes. Copy .github/demo/deploy.yml
+   to .github/workflows/deploy.yml unchanged. Keep dependencies and the lockfile unchanged,
+   and preserve the seeded workflow and feedback-validation findings for the review exercise.
+   Stop when the diff is ready for inspection. Do not commit, push, create a PR, or merge yet.
+   If dependency installation is blocked by this host's registry, report it; do not change
+   package versions or registry settings to work around it.
+   ```
+
+8. Inspect the implementation diff. Do not create a second implementation session for the issue.
+9. Open the arrow beside **Create PR** and point out **Agent merge**. Leave **Create PR** selected
+   for now: the audience must see the review before the feature is allowed to merge.
+10. Click the main **Create PR** button and follow its confirmation prompts to publish a
+    non-draft PR. Ensure its description includes `Closes #<issue-number>`.
+11. Keep the original implementation session open. Use the browser or its PR panel to show the
+    new PR, but return to this session for Beat 2.
 
 **Expected result:** the pull request updates lesson/widget code and adds
 `.github/workflows/deploy.yml` by copying `.github/demo/deploy.yml`.
@@ -246,10 +273,16 @@ Copilot:
 Revert all changes to package.json and package-lock.json. Do not change dependencies.
 ```
 
-Wait for the correction and green **Pull request checks**.
+Wait for the correction and green `build` and `audit` checks on GitHub. A local registry failure
+does not count as a successful local build; use the actual GitHub check results as evidence.
+
+**Alternative, not the primary Agent Merge walkthrough:** assigning an issue to the cloud coding
+agent on GitHub can also produce a PR. Do not both assign it and start a separate implementation
+for the same issue. Opening the cloud-created PR in a new review session does not guarantee the
+same Agent Merge controls; rehearse that handoff separately before choosing it.
 
 GitHub reference:
-[Get started with Copilot agents on GitHub](https://docs.github.com/en/copilot/how-tos/copilot-on-github/use-copilot-agents/overview).
+[Managing issues and pull requests with the GitHub Copilot app](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests).
 
 ## 9. Record Beat 1 — Copilot Code Review
 
@@ -273,31 +306,46 @@ GitHub reference:
 
 ## 10. Record Beat 2 — address review and Agent Merge
 
-1. Open the pull request in **My work** in the GitHub Copilot app.
-2. Scroll to each Copilot review comment.
-3. Select **Copilot Fix** for each finding, or start a pull-request session and enter:
+1. Return to the **original feature implementation session** from Step 8, not a new PR-review
+   session. Confirm its linked PR is the feature PR, not the prepared Dependabot PR.
+2. Show the Copilot review findings in the PR panel or browser.
+3. In the original implementation session, enter:
 
    ```text
    Address all Copilot Code Review findings. Pin Actions to full commit SHAs, replace write-all
    with least-privilege Pages permissions, and validate feedback input. Do not change dependencies.
    ```
 
-4. Review the resulting diff.
-5. Confirm both **Pull request checks** (`build`) and **Dependency policy** (`audit`) are running
-   or have passed.
-6. In the session, open the dropdown beside **Create PR** or the current PR action.
-7. Select **Agent merge**, then select the **Agent merge** button.
-8. Open its dropdown and permit **Address reviews**, **Fix CI failures**, **Resolve conflicts**, and
-   **Merge pull request** when those options are shown.
-9. Keep the session visible until GitHub merges the pull request.
+4. Review the resulting diff and have the session commit and push the fixes to the same PR.
+   Keep dependencies unchanged.
+5. Confirm both **Pull request checks** (`build`) and **Dependency policy** (`audit`) have started
+   for the latest commit or have passed. Do not substitute an older commit's green results.
+6. Open the dropdown beside **Create PR** or the current PR action and select **Agent merge**.
+   Point out that the main button's label changes to **Agent merge**.
+7. Click the main **Agent merge** button to start it. Selecting the menu item alone is not the
+   same as starting the action. The session must manage the existing linked feature PR, not
+   create a duplicate.
+8. Show the Agent Merge action permissions. Permit **Address reviews**, **Fix CI failures**, and
+   **Resolve conflicts** as needed. Permit **Merge pull request** only after the intended review
+   fixes have been inspected and you are ready for the feature to land. If the UI already
+   permits merging when you start it, complete that inspection before starting.
+9. Keep the session visible as it checks the PR and merges it when GitHub allows. Show the PR's
+   **Merged** state, then switch to the deployment run.
 
 **Expected result:** Agent Merge lands the reviewed feature PR after required checks pass.
 
-If using native GitHub auto-merge instead, enable it while checks are pending. If everything is
-already green, use immediate merge after reviewing the diff; this is not a demo failure.
+Say: "This is Agent Merge in the Copilot app, not GitHub's Enable auto-merge button. The agent
+checks the PR and handles allowed follow-up work; GitHub still enforces the required checks."
+
+Green checks do not prevent Agent Merge from working. There is no need to race a pending-check
+window. If everything is already satisfied, the merge may happen quickly. Do not silently replace
+this beat with native **Enable auto-merge** or a manual merge and describe it as Agent Merge.
+If the app control is unavailable, use the prepared Agent Merge recording and label the fallback.
 
 GitHub reference:
 [Managing issues and pull requests with the GitHub Copilot app](https://docs.github.com/en/copilot/how-tos/github-copilot-app/managing-issues-and-pull-requests).
+The [Agent Merge workshop](https://awesome-copilot.github.com/learning-hub/copilot-workshops/app/6-agent-merge/)
+shows the dropdown, start button, and merge permission.
 
 ## 11. Record Beat 3 — production gate blocks deployment
 
@@ -328,9 +376,14 @@ Do not rerun the failed workflow; it should remain as evidence of the blocked st
    bearer-header fixture. State clearly that it is a non-functional test value.
 8. Open **Pull requests** and select the prepared Dependabot `marked` update.
 9. Show its green **Dependency policy** and **Pull request checks**.
-10. Open that pull request in the GitHub Copilot app **My work** view.
-11. Enable **Agent merge** and permit **Merge pull request**.
-12. Wait for the dependency pull request to merge.
+10. Review the dependency diff, then merge this prepared PR on GitHub after its required checks
+    pass. Do not merge it before the feature deployment has demonstrated the failing gate.
+11. Explain that Dependabot generated the remediation and GitHub checked it. Agent Merge was
+    demonstrated explicitly on the feature PR in Beat 2; this is a separate dependency merge.
+
+Do not assume a new Dependabot review session will expose Agent Merge: it may show **Submit
+review** instead. Use Agent Merge for this PR only if you separately rehearsed and verified that
+route. A green PR may offer immediate native merge rather than native **Enable auto-merge**.
 
 **Expected result:** the dependency update is independently generated, checked, and merged without
 weakening the production gate. The audience also sees where Secret Protection and Push protection
@@ -379,7 +432,9 @@ The canonical template remains unchanged and ready for the next presenter.
 | Generic patterns is enabled but its alert is missing | Continue after preflight reports this as informational |
 | Copilot is absent from **Assignees** | Confirm the coding-agent license, feature setting, organization policy, and repository access |
 | Automatic review is absent | Request Copilot from the PR **Reviewers** sidebar once |
-| Agent Merge is absent | Use the GitHub Copilot app, confirm repository access and auto-merge, then verify the Copilot plan |
+| Session shows **Submit review** instead of Agent Merge | Return to the original feature implementation session; a new Dependabot or cloud-PR review session is not the demonstrated authoring route |
+| Empty session has no **Create PR** | Implement the feature and inspect its diff first, then check the implementation session's PR-action dropdown |
+| Agent Merge is absent in the implementation session | Confirm the app version, repository access, and Copilot plan; use the prepared Agent Merge recording rather than claim a manual merge is Agent Merge |
 | **Enable auto-merge** is absent | Confirm the PR is non-draft, **Allow auto-merge** is enabled, and the active ruleset requires `build` and `audit`; if everything already passes, use immediate merge |
 | `audit` remains **Expected** with no run | Remove dependency-path filters from **Dependency policy** using the updated template workflow, then push a new commit to trigger both checks; rerunning a skipped workflow is not sufficient |
 | Preflight reports missing or incorrect merge rules | Rerun bootstrap with `--apply --skip-deploy`, then confirm the ruleset above; do not bypass it |

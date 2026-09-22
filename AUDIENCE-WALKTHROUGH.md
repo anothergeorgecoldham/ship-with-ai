@@ -9,7 +9,7 @@ Use this page to follow the demonstration without needing to configure a reposit
 | 1. Issue | A short description and acceptance criteria | AI starts from a reviewable statement of intent |
 | 2. Draft | Copilot creates a branch and pull request | Implementation is visible before it reaches production |
 | 3. Review | Copilot comments on code and workflow risks | AI-generated code receives independent scrutiny |
-| 4. Fix | Agent Merge applies fixes after checks | Findings become tested changes instead of manual follow-up |
+| 4. Fix and merge | Copilot addresses findings; the presenter starts Agent Merge in the implementation session | Reviewed changes reach the branch only after required checks pass |
 | 5. Gate | The deployment stops on a vulnerable dependency | Security policy is enforced even when the application builds |
 | 6. Deploy | Dependabot fixes the dependency and Pages updates | A verified change moves from idea to a live result |
 
@@ -18,6 +18,7 @@ Use this page to follow the demonstration without needing to configure a reposit
 - [ ] The issue explains what success means.
 - [ ] The pull request shows exactly what the AI changed.
 - [ ] Review identifies unsafe permissions, unpinned Actions, or missing validation.
+- [ ] The presenter explicitly starts **Agent merge** in the Copilot app's implementation session.
 - [ ] Automated checks stay green before the feature is merged.
 - [ ] The production pipeline blocks the vulnerable dependency.
 - [ ] The dependency update clears the gate.
@@ -30,6 +31,10 @@ Use this page to follow the demonstration without needing to configure a reposit
 - **GitHub Actions and Agent Merge** enforce the result and move verified changes forward.
 
 No single AI decision is treated as sufficient to ship.
+
+Creating an issue does not automatically create a PR: the presenter starts a Copilot app
+implementation session from the issue and publishes its changes. That same session is used for
+Agent Merge after review. GitHub's native **Enable auto-merge** is a different control.
 
 Some presenters may also show Generic secret scanning. That is an optional extension because the
 setting is not available to every account; it is not required for the six-stage lifecycle.
