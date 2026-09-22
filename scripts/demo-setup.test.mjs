@@ -1,10 +1,20 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { assertMergeRuleset, mergeRuleset } from './lib/merge-rules.mjs';
+
+test('Astro is exactly pinned to the release manifest in package and lockfile', () => {
+  const manifest = JSON.parse(readFileSync(new URL('../demo-kit.json', import.meta.url), 'utf8'));
+  const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  const lockfile = JSON.parse(readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'));
+  const expected = manifest.startState.dependencies.astro;
+  assert.equal(packageJson.dependencies.astro, expected);
+  assert.equal(lockfile.packages[''].dependencies.astro, expected);
+  assert.equal(lockfile.packages['node_modules/astro'].version, expected);
+});
 
 test('merge rules require the exact Actions checks without human approval or bypass', () => {
   assert.equal(mergeRuleset.enforcement, 'active');
